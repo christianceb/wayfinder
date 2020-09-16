@@ -4,10 +4,12 @@ import {
   Text,
   View
 } from 'react-native';
+import Popup from '../modals/Popup'
 
 const Home = () => {
   return (
     <View>
+      <Popup/>
       <Text style={styles.title}>
         Home
       </Text>
@@ -16,6 +18,7 @@ const Home = () => {
 };
 
 export default Home;
+
 
 const styles = StyleSheet.create({
   title: {
