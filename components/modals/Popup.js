@@ -22,15 +22,15 @@ const Popup = () => {
             Default Campus
           </Text>
           <Picker
-          mode="dropdown"
-          selectedValue={selectedValue}
-          style={{ height: 50, width: 150 }}
-          onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
-          >
-          <Picker.Item label="Perth" value="perth" />
-          <Picker.Item label="Joondalup" value="joondalup" />
-          <Picker.Item label="East Perth" value="esp" />
-          <Picker.Item label="Leederville" value="leederville" />
+            mode="dropdown"
+            selectedValue={selectedValue}
+            style={{ height: 50, width: 150 }}
+            onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+            >
+            <Picker.Item label="Perth" value="perth" />
+            <Picker.Item label="Joondalup" value="joondalup" />
+            <Picker.Item label="East Perth" value="esp" />
+            <Picker.Item label="Leederville" value="leederville" />
           </Picker>
           <Button title="OK" onPress={() => {setModalVisible(false)}}/>
         </View>

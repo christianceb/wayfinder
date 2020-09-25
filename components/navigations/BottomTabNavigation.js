@@ -4,6 +4,8 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import Icon from 'react-native-vector-icons/Ionicons';
 import Home from '../screens/Home';
 import Search from '../screens/Search';
+import Calendar from '../screens/Calendar';
+import Settings from '../screens/Settings';
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -12,7 +14,7 @@ const MainTabScreen = () => (
       initialRouteName="Home"
       activeColor="#fff"
       barStyle={styles.bar}
-    >
+      >
       <Tab.Screen
         name="Home"
         component={Home}
@@ -30,6 +32,26 @@ const MainTabScreen = () => (
           tabBarLabel: 'Search',
           tabBarIcon: ({ color }) => (
             <Icon name="search" color={color} size={26} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Calendar"
+        component={Calendar}
+        options={{
+          tabBarLabel: 'Calendar',
+          tabBarIcon: ({ color }) => (
+            <Icon name="calendar" color={color} size={26} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Settings"
+        component={Settings}
+        options={{
+          tabBarLabel: 'Settings',
+          tabBarIcon: ({ color }) => (
+            <Icon name="settings" color={color} size={26} />
           ),
         }}
       />
