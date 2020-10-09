@@ -9,7 +9,7 @@ const EventDetails = () => {
   return (
     <View style={styles.container}>
       <Text>
-        DetailScreen
+        EventDetailScreen
       </Text>
     </View>    
   );
