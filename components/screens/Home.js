@@ -1,19 +1,17 @@
 import React from 'react';
 import {
   StyleSheet,
-  Text,
   View
 } from 'react-native';
 import Popup from '../modals/Popup'
+import { Main as MainMap } from '../maps/Main'
 
 const Home = () => {
   return (
-    <View>
-      <Popup/>
-      <Text style={styles.title}>
-        Home
-      </Text>
-    </View>    
+    <View style={{flex: 1}}>
+      <Popup />
+      <MainMap />
+    </View>
   );
 };
 
