@@ -19,7 +19,7 @@ const Search = ( {navigation} ) => {
           />
           <Card 
             style={styles.card} 
-            onPress={() => navigation.navigate("Details")}
+            onPress={() => navigation.navigate("EventDetails")}
             >
             <Card.Cover source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Tursiops_truncatus_01.jpg/330px-Tursiops_truncatus_01.jpg' }} />
             <Card.Content>
@@ -29,7 +29,7 @@ const Search = ( {navigation} ) => {
           </Card>
           <Card 
             style={styles.card} 
-            onPress={() => navigation.navigate("Details")}
+            onPress={() => navigation.navigate("EventDetails")}
             >
             <Card.Cover source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Dacelo_novaeguineae_waterworks.jpg/330px-Dacelo_novaeguineae_waterworks.jpg' }} />
               <Card.Content>
@@ -39,12 +39,11 @@ const Search = ( {navigation} ) => {
           </Card>
           <Card 
             style={styles.card} 
-            onPress={() => navigation.navigate("Details")}
+            onPress={() => navigation.navigate("LocationDetails", { locations: ['L-260', 'Building 2', '30 Aberdeen St, Perth, Western Australia'] })}
             >
-            <Card.Cover source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Leucopsar_rothschildi_-Brookfield_Zoo%2C_Chicago%2C_USA-8a_%281%29.jpg/330px-Leucopsar_rothschildi_-Brookfield_Zoo%2C_Chicago%2C_USA-8a_%281%29.jpg' }} />
               <Card.Content>
-                <Title>Singing Contest</Title>
-                <Paragraph>Library, Building 2, Perth</Paragraph>
+                <Title>L-260</Title>
+                <Paragraph>Building 2</Paragraph>
               </Card.Content>
           </Card>
       </ScrollView>
@@ -71,7 +70,7 @@ const styles = StyleSheet.create({
   },
   card: {
     borderRadius: 10,
-    marginVertical: 10,
+    marginVertical: 8,
     marginHorizontal: 20,
   }
 })
