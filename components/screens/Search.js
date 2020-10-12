@@ -9,6 +9,8 @@ import { Card, Title, Paragraph } from 'react-native-paper';
 
 const Search = ( {navigation} ) => {
   const [value, onChangeText] = React.useState(' ');
+  const image1 = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Tursiops_truncatus_01.jpg/330px-Tursiops_truncatus_01.jpg';
+  const image2 = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Dacelo_novaeguineae_waterworks.jpg/330px-Dacelo_novaeguineae_waterworks.jpg';
   return (
     <SafeAreaView >
       <ScrollView >
@@ -19,9 +21,9 @@ const Search = ( {navigation} ) => {
           />
           <Card 
             style={styles.card} 
-            onPress={() => navigation.navigate("EventDetails")}
+            onPress={() => navigation.navigate("EventDetails", { events: [image1, 'Silent Disco', 'Monday, 12 October 09:00-12:30', 'L-260', '30 Aberdeen St, Perth, Western Australia'] })}
             >
-            <Card.Cover source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Tursiops_truncatus_01.jpg/330px-Tursiops_truncatus_01.jpg' }} />
+            <Card.Cover source={{ uri: image1 }} />
             <Card.Content>
               <Title>Silent Disco</Title>
               <Paragraph>L-260, Building 2, Perth</Paragraph>
@@ -29,9 +31,9 @@ const Search = ( {navigation} ) => {
           </Card>
           <Card 
             style={styles.card} 
-            onPress={() => navigation.navigate("EventDetails")}
+            onPress={() => navigation.navigate("EventDetails", { events: [image2, 'Last Man Standing', 'Tuesday, 25 September 09:00-12:30', 'L-404', '30 Aberdeen St, Perth, Western Australia'] })}
             >
-            <Card.Cover source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Dacelo_novaeguineae_waterworks.jpg/330px-Dacelo_novaeguineae_waterworks.jpg' }} />
+            <Card.Cover source={{ uri: image2 }} />
               <Card.Content>
                 <Title>Last Man Standing</Title>
                 <Paragraph>L-404, Building 2, Perth</Paragraph>
