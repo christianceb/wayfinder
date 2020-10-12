@@ -59,4 +59,4 @@ buck-out/
 /ios/Pods/
 
 # VS Code
-launch.json
+.vscode/

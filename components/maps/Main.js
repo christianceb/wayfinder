@@ -3,7 +3,6 @@ import { View } from 'react-native';
 import MapboxGL, { MapView, Camera, UserLocation } from "@react-native-mapbox-gl/maps";
 import { FAB } from 'react-native-paper';
 import Baseline from './Baseline'
-import LocationsData from '~/locations/data.json'
 import Marker from '~/assets/room-2x.png'
 import {featureCollection, feature} from '@turf/helpers';
 
@@ -36,7 +35,7 @@ export class Main extends Component {
     buildFeatures() {
         const grouped = {'campuses': [], 'buildings': [], 'rooms': []};
 
-        for (const location of LocationsData) {
+        for (const location of global.locationsData) {
             let group = null
 
             if (location.type === 0) {
@@ -49,7 +48,6 @@ export class Main extends Component {
             // Only show locations that have coordinates in them
             if (group && location.mp_lat && location.mp_lng) {
                 let feat = this.buildFeature(location)
-                console.log(feat);
                 grouped[group].push(feat);
             }
         }
@@ -85,11 +83,6 @@ export class Main extends Component {
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
         });
-    }
-
-    componentDidMount() {
-        MapboxGL.setAccessToken("pk.eyJ1IjoiY2hyaXN0aWFuY2ViIiwiYSI6ImNrZDN4MzQyODEwcTMyc251ZGJnY3R2aDYifQ.Iip2TLYYP-vYS145IdHWXQ")
-        MapboxGL.setTelemetryEnabled(false)
     }
 
     render() {
