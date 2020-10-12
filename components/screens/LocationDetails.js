@@ -34,7 +34,7 @@ const LocationDetails = ( {navigation, route} ) => {
         </View>
         <View style={{ paddingTop: 100 }}>
           <Image style={{
-            width: 500,
+            width: '100%',
             height: 400
           }}
             source={{
