@@ -18,9 +18,10 @@ const EventDetails = ( {navigation, route} ) => {
         <View>
           <Image style={{
             width: '100%',
-            height: 250
+            height: 250,
+            backgroundColor: "#f8f2db"
           }}
-            source={{ uri: route.params.events[0] }} />
+          />
         </View>
         <View style={styles.viewDescription}>
           <MaterialIcon name="calendar" size={50} color="#000000" />
@@ -28,23 +29,23 @@ const EventDetails = ( {navigation, route} ) => {
               paddingLeft: 10
             }}>
             <Text style={styles.event}>
-              {route.params.events[1]}
+              {route.params.title}
             </Text>
             <Paragraph>
-              {route.params.events[2]}
+              {route.params.start} - {route.params.end}
             </Paragraph>
           </View>
         </View>
         <View style={styles.viewBottom}>
         <Icon name="location-pin" size={30} color="#000000" />
           <Text style={styles.text}>
-            {route.params.events[3]}
+            {route.params.location}
           </Text>
         </View>
         <View style={styles.viewBottom}>
         <Icon name="pin-drop" size={30} color="#000000" />
           <Text style={styles.text}>
-            {route.params.events[4]}
+            {route.params.address}
           </Text>
         </View>
         <View style={{ 
@@ -89,6 +90,7 @@ const styles = StyleSheet.create({
     color: "black"
   },
   text: {
-    fontSize: 14
+    fontSize: 14,
+    paddingHorizontal: 10
   }
 })

@@ -15,12 +15,12 @@ export class Mini extends Component {
     constructor(props) {
         super(props)
 
-        this.render = true;
+        this.renderMap = true;
 
         // TODO: do not render if location is not set (done), and if there is no coordinates data
 
         if (typeof props.locationId === 'undefined' || props.locationId == null) {
-            this.render = false;
+            this.renderMap = false;
         } else {
             this.location = global.locationsData.find(element => element.id == props.locationId);
     
@@ -35,7 +35,7 @@ export class Mini extends Component {
     }
 
     render() {
-        if (this.render) {
+        if (this.renderMap) {
             return (
                 <View style={{width: '100%', height: 400}}>
                     <MapView style={{flex: 1}}>
