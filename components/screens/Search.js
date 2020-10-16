@@ -1,16 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   SafeAreaView, 
   ScrollView, 
   TextInput,
+  FlatList,
 } from 'react-native';
 import { Card, Title, Paragraph } from 'react-native-paper';
 
-const Search = ( {navigation} ) => {
+const Search = ( { navigation } ) => {
   const [value, onChangeText] = React.useState(' ');
-  const image1 = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Tursiops_truncatus_01.jpg/330px-Tursiops_truncatus_01.jpg';
-  const image2 = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Dacelo_novaeguineae_waterworks.jpg/330px-Dacelo_novaeguineae_waterworks.jpg';
+  const [data, setData] = useState([]);
+
+  const getEventsFromApiAsync = async () => {
+    try {
+      let response = await fetch(
+        'http://wayfinder-laravel.herokuapp.com/api/events'
+      );
+      let json = await response.json();
+      setData(json.result.data)
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  getEventsFromApiAsync();
+
   return (
     <SafeAreaView >
       <ScrollView >
@@ -19,35 +34,32 @@ const Search = ( {navigation} ) => {
           onChangeText={text => onChangeText(text)}
           value={value}
           />
-          <Card 
+          <FlatList
+          data={data}
+          keyExtractor={({ id }, index) => id}
+          renderItem={({ item }) => (
+            <Card 
             style={styles.card} 
-            onPress={() => navigation.navigate("EventDetails", { events: [image1, 'Silent Disco', 'Monday, 12 October 09:00-12:30', 'L-260', '30 Aberdeen St, Perth, Western Australia'] })}
+            onPress={() => navigation.navigate("EventDetails", { 
+              title: item.title, 
+              description: item.description,
+              start: item.start,
+              end: item.end,
+              location: item.location.name,
+              address: item.location.address 
+            })}
             >
-            <Card.Cover source={{ uri: image1 }} />
-            <Card.Content>
-              <Title>Silent Disco</Title>
-              <Paragraph>L-260, Building 2, Perth</Paragraph>
-            </Card.Content>
-          </Card>
-          <Card 
-            style={styles.card} 
-            onPress={() => navigation.navigate("EventDetails", { events: [image2, 'Last Man Standing', 'Tuesday, 25 September 09:00-12:30', 'L-404', '30 Aberdeen St, Perth, Western Australia'] })}
-            >
-            <Card.Cover source={{ uri: image2 }} />
+            <Card.Cover style={{ 
+              backgroundColor: "#f8f2db" 
+              }} 
+            />
               <Card.Content>
-                <Title>Last Man Standing</Title>
-                <Paragraph>L-404, Building 2, Perth</Paragraph>
+                <Title>{item.title}</Title>
+                <Paragraph>{item.description}</Paragraph>
               </Card.Content>
-          </Card>
-          <Card 
-            style={styles.card} 
-            onPress={() => navigation.navigate("LocationDetails", { locations: ['L-260', 'Building 2', '30 Aberdeen St, Perth, Western Australia'] })}
-            >
-              <Card.Content>
-                <Title>L-260</Title>
-                <Paragraph>Building 2</Paragraph>
-              </Card.Content>
-          </Card>
+            </Card>
+          )}
+        />
       </ScrollView>
     </SafeAreaView>    
   );
