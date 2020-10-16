@@ -12,10 +12,10 @@ const Search = ( { navigation } ) => {
   const [value, onChangeText] = React.useState(' ');
   const [data, setData] = useState([]);
 
-  const getEventsFromApiAsync = async () => {
+  const getLocationsFromApiAsync = async () => {
     try {
       let response = await fetch(
-        'http://wayfinder-laravel.herokuapp.com/api/events'
+        'http://wayfinder-laravel.herokuapp.com/api/locations'
       );
       let json = await response.json();
       setData(json.result.data)
@@ -24,7 +24,7 @@ const Search = ( { navigation } ) => {
     }
   };
 
-  getEventsFromApiAsync();
+  getLocationsFromApiAsync();
 
   return (
     <SafeAreaView >
@@ -40,23 +40,16 @@ const Search = ( { navigation } ) => {
           renderItem={({ item }) => (
             <Card 
             style={styles.card} 
-            onPress={() => navigation.navigate("EventDetails", { 
-              title: item.title, 
-              description: item.description,
-              start: item.start,
-              end: item.end,
-              location: item.location.name,
-              address: item.location.address 
+            onPress={() => navigation.navigate("LocationDetails", { 
+              name: item.name,
+              parent: item?.parent?.name,
+              address: item.address
             })}
             >
-            <Card.Cover style={{ 
-              backgroundColor: "#f8f2db" 
-              }} 
-            />
-              <Card.Content>
-                <Title>{item.title}</Title>
-                <Paragraph>{item.description}</Paragraph>
-              </Card.Content>
+            <Card.Content>
+              <Title>{item.name}</Title>
+              {item.parent == null ? <Paragraph>{item.name}</Paragraph> : <Paragraph>{item.parent.name}</Paragraph>}
+            </Card.Content>
             </Card>
           )}
         />

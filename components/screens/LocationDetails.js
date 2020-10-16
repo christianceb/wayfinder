@@ -17,19 +17,19 @@ const LocationDetails = ( {navigation, route} ) => {
         <View style={styles.viewTop}>
         <Icon name="location-pin" size={50} color="#000000" />
           <Text style={styles.location}>
-            {route.params.locations[0]}
+            {route.params.name}
           </Text>
         </View>
         <View style={styles.viewBottom}>
         <MaterialIcon name="office-building" size={30} color="#000000" />
           <Text style={styles.text}>
-            {route.params.locations[1]}
+            {route.params.parent}
           </Text>
         </View>
         <View style={styles.viewBottom}>
         <Icon name="pin-drop" size={30} color="#000000" />
           <Text style={styles.text}>
-            {route.params.locations[2]}
+            {route.params.address}
           </Text>
         </View>
         <View style={{ paddingTop: 100 }}>
