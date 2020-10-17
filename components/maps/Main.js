@@ -25,6 +25,8 @@ export class Main extends Component {
             longitude: Baseline.Lng,
             campuses: featureCollection([...features.campuses]),
             buildings: featureCollection([...features.buildings]),
+            pendingCampusFly: false,
+            processingFly: false
         };
 
         this.onUserLocationUpdate = this.onUserLocationUpdate.bind(this);
@@ -68,7 +70,7 @@ export class Main extends Component {
         this._camera.setCamera({
             centerCoordinate: [this.state.longitude, this.state.latitude],
             zoomLevel: 17,
-            animationDuration: 2000,
+            animationDuration: 1000,
         });
     }
 
@@ -83,6 +85,34 @@ export class Main extends Component {
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
         });
+    }
+
+    componentDidUpdate(prevProps) {
+        // Fly camera to location if all flags are up
+        if (this.state.pendingCampusFly && this.state.processingFly === false && typeof this._camera !== "undefined") {
+            this.setState({processingFly: true});
+
+            for (const location of global.locationsData) {
+                if (location.id == this.props.campus) {
+                    this._camera.setCamera({
+                        centerCoordinate: [location.mp_lng, location.mp_lat],
+                        zoomLevel: 17,
+                        animationDuration: 2000,
+                    });
+
+                    this.setState({
+                        processingFly: false,
+                        pendingCampusFly: false
+                    });
+                    break;
+                }
+            }
+        }
+
+        // Listen to changes in props so we can run the routine defined earlier.
+        if (prevProps.campus != this.props.campus) {
+            this.setState({pendingCampusFly: true});
+        }
     }
 
     render() {

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { Component } from 'react';
 import {
   StyleSheet,
   Text,
@@ -10,81 +10,125 @@ import {
 import { ScrollView } from 'react-native-gesture-handler';
 import { Card, Title, Paragraph } from 'react-native-paper';
 import { RadioButton } from 'react-native-paper';
+import AsyncStorage from '@react-native-community/async-storage'
 
-const Settings = () => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [value, setValue] = useState('Perth');
-  return (
-    <SafeAreaView>
-      <ScrollView>
-      <Modal
-        transparent={true}
-        visible={modalVisible}>
-          <View style={styles.blur}>
-            <View style={styles.modal}>
-              <Text style={styles.head}>
-                Default Campus
-              </Text>
-              <RadioButton.Group onValueChange={value => setValue(value)} value={value}>
-                <View style={styles.items}>
-                  <Text>Perth</Text>
-                  <RadioButton value="Perth" />
-                </View>
-                <View style={styles.items}>
-                  <Text>Leederville</Text>
-                  <RadioButton value="Leederville" />
-                </View>
-                <View style={styles.items}>
-                  <Text>East Perth</Text>
-                  <RadioButton value="East Perth" />
-                </View>
-                <View style={styles.items}>
-                  <Text>Midland</Text>
-                  <RadioButton value="Midland" />
-                </View>
-                <View style={styles.items}>
-                  <Text>Mount Lawley</Text>
-                  <RadioButton value="Mount Lawley" />
-                </View>
-                <View style={styles.items}>
-                  <Text>Joondalup</Text>
-                  <RadioButton value="Joondalup" />
-                </View>
-                <View style={styles.items}>
-                  <Text>Clarkson</Text>
-                  <RadioButton value="Clarkson" />
-                </View>
-              </RadioButton.Group>
-            <View style={styles.button}>
-              <Button title="OK" onPress={() => {setModalVisible(false)}}/>
-            </View>
-            </View>
+export default class Settings extends Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      promptDefaultLocation: false,
+      campus: null,
+      name: null
+    }
+
+    this.rbItems = this.buildRadioButtonItems();
+  }
+
+  buildRadioButtonItems() {
+    const rdItems = []
+
+    for (const location of global.locationsData) {
+      if (location.type === 0) {
+        rdItems.push(
+          <View key={location.id} style={styles.items}>
+            <Text>{location.name}</Text>
+            <RadioButton value={location.id} />
           </View>
-        </Modal>    
-        <View style={styles.header}>
-          <Text style={styles.title}>
-            Settings
-          </Text>
-        </View>
-        <View>
-          <Card
-            style={styles.card}
-            onPress={() => {setModalVisible(true)}}
-              >
-              <Card.Content>
-                <Title>Default Campus</Title>
-                <Paragraph>
-                  {value}
-                </Paragraph>
-              </Card.Content>
-          </Card>  
-        </View>    
-      </ScrollView>
-    </SafeAreaView>
-  );
-};
+        )
+      }
+    }
 
-export default Settings;
+    return rdItems;
+  }
+
+  async componentDidMount() {
+    let campus = null
+
+    try {
+      const value = await AsyncStorage.getItem('default_campus')
+
+      if (value !== null) {
+        campus = parseInt(value)
+      }
+    } catch(e) {
+      // do nothing
+    } finally {
+      if (campus !== null) {
+        name = null;
+
+        for (const location of global.locationsData) {
+          if (location.id === campus) {
+            name = location.name;
+            break;
+          }
+        }
+
+        this.setState({
+          campus: campus,
+          name: name
+        })
+      }
+    }
+  }
+
+  async saveDefaultCampus () {
+    try {
+      await AsyncStorage.setItem('default_campus', this.state.campus.toString())
+    } catch (e) {
+      // Do nothing despite failing to save the selected default campus?
+    } finally {
+      let location = global.locationsData.find(element => element.id == this.state.campus);
+
+      this.setState({
+        promptDefaultLocation: false,
+        name: location.name
+      });
+    }
+  }
+
+  render() {
+    return (
+      <SafeAreaView>
+        <ScrollView>
+        <Modal
+          transparent={true}
+          visible={this.state.promptDefaultLocation}>
+            <View style={styles.blur}>
+              <View style={styles.modal}>
+                <Text style={styles.head}>
+                  Default Campus
+                </Text>
+                <RadioButton.Group onValueChange={value => this.setState({ campus: value })} value={this.state.campus}>{this.rbItems}</RadioButton.Group>
+                <View style={styles.button}>
+                  <Button title="OK" onPress={() => { this.saveDefaultCampus() }}/>
+                </View>
+              </View>
+            </View>
+          </Modal>    
+          <View style={styles.header}>
+            <Text style={styles.title}>
+              Settings
+            </Text>
+          </View>
+          <View>
+            <Card
+              style={styles.card}
+              onPress={() => { this.setState({ promptDefaultLocation: true })}}
+                >
+                <Card.Content>
+                  <Title>Default Campus</Title>
+                  <Paragraph>
+                    {this.state.name}
+                  </Paragraph>
+                </Card.Content>
+            </Card>  
+          </View>    
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   title: {
