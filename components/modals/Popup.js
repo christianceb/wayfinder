@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Component } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,40 +6,74 @@ import {
   Modal,
   Button,
 } from 'react-native';
-import { Picker } from '@react-native-community/picker';
+import { Picker } from '@react-native-community/picker'
+import AsyncStorage from '@react-native-community/async-storage'
 
+export default class Popup extends Component {
+  constructor(props) {
+    super(props)
 
-const Popup = () => {
-  const [modalVisible, setModalVisible] = useState(true);
-  const [selectedValue, setSelectedValue] = useState("perth");
-  return (
-    <Modal
-    transparent={true}
-    visible={modalVisible}>
-      <View style={styles.blur}>
-        <View style={styles.modal}>
-          <Text style={styles.title}>
-            Default Campus
-          </Text>
-          <Picker
-            mode="dropdown"
-            selectedValue={selectedValue}
-            style={{ height: 50, width: 150 }}
-            onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
-            >
-            <Picker.Item label="Perth" value="perth" />
-            <Picker.Item label="Joondalup" value="joondalup" />
-            <Picker.Item label="East Perth" value="esp" />
-            <Picker.Item label="Leederville" value="leederville" />
-          </Picker>
-          <Button title="OK" onPress={() => {setModalVisible(false)}}/>
+    this.firstItem = null;
+    this.pickerItems = this.buildPickerItems();
+
+    this.state = {
+      visible: true,
+      campus: this.firstItem
+    }
+
+    this.setCampus = this.setCampus.bind(this)
+    this.onValueChange = this.onValueChange.bind(this)
+  }
+
+  buildPickerItems() {
+    const pickerItems = []
+
+    for (const location of global.locationsData) {
+      if (location.type == 0) {
+        // Set first item in the list for later use in the class
+        if (this.firstItem === null) {
+          this.firstItem = location.id
+        }
+
+        pickerItems.push(<Picker.Item key={location.id} label={location.name} value={location.id} />)
+      }
+    }
+  
+    return pickerItems;
+  }
+
+  async setCampus() {
+    try {
+      await AsyncStorage.setItem('default_campus', this.state.campus.toString())
+    } catch (e) {
+      // Do nothing despite failing to save the selected default campus?
+    } finally {
+      this.setState({ visible: false });
+    }
+  }
+
+  onValueChange(itemValue) {
+    this.setState({campus: itemValue});
+  }
+
+  render() {
+    return (
+      <Modal transparent={true} visible={this.state.visible}>
+        <View style={styles.blur}>
+          <View style={styles.modal}>
+            <Text style={styles.title}>Default Campus</Text>
+            
+            <Picker mode="dropdown" style={{ height: 50, width: "100%" }} selectedValue={this.state.campus} onValueChange={this.onValueChange}>
+              {this.pickerItems}
+            </Picker>
+
+            <Button title="OK" onPress={this.setCampus} />
+          </View>
         </View>
-      </View>
-    </Modal>    
-  );
-};
-
-export default Popup;
+      </Modal>
+    )
+  }
+}
 
 const styles = StyleSheet.create({
   blur: {

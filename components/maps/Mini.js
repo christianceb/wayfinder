@@ -31,7 +31,6 @@ export class Mini extends Component {
                 })])
             };
         }
-
     }
 
     render() {
