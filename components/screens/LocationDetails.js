@@ -10,7 +10,8 @@ import { Mini as MiniMap } from '../maps/Mini'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const LocationDetails = ( {navigation, route} ) => {
+const LocationDetails = ( { navigation, route } ) => {
+  
   const getParentName = (id) => {
     if (id != null) {
       let locationsParent = global.locationsData.find(item => item.id == id);
@@ -23,6 +24,7 @@ const LocationDetails = ( {navigation, route} ) => {
     }
     return route.params.name
   }
+
   return (
     <SafeAreaView>
       <ScrollView>
