@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
     color: "black"
   },
   text: {
-    fontSize: 14
+    fontSize: 14,
+    paddingHorizontal: 10
   }
 })
