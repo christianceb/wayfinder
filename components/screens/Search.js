@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import {
   StyleSheet,
   SafeAreaView, 
-  ScrollView, 
   TextInput,
   FlatList,
+  View,
 } from 'react-native';
 import { Card, Title, Paragraph } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const Search = ( { navigation } ) => {
-  const [value, onChangeText] = React.useState(' ');
+  const [data, setData] = useState(global.locationsData);
 
   const returnParents = (parent) => {
     let parentLocation = global.locationsData.find(item => item.id == parent);
@@ -21,30 +22,45 @@ const Search = ( { navigation } ) => {
     return parentsString
   }
 
+  function filter(text) {
+    let locArray = global.locationsData    
+    const newLocation = locArray.filter(item => {      
+      const itemData = `${item.name.toLowerCase()}`;
+      
+      const textData = text.toLowerCase();
+        
+      return itemData.indexOf(textData) > -1;    
+    });
+    setData(newLocation)
+  };
+
   return (
     <SafeAreaView style={{flex: 1}}>
-      <TextInput
-        style={styles.search}
-        onChangeText={text => onChangeText(text)}
-        value={value}
-        />
-        <FlatList
-          data={global.locationsData}
-          keyExtractor={({ id }, index) => id.toString()}
-          renderItem={({ item }) => (
-          <Card 
-            style={styles.card} 
-            onPress={() => navigation.navigate("LocationDetails", { 
-              name: item.name,
-              parent: item.parent_id,
-              address: item.address
-            })}
-            >
-            <Card.Content>
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.inputStyle}
+          onChangeText={value => filter(value)}
+          autoCorrect={false}
+          />
+        <Icon style={styles.icon} name='search' color='#000' size={25}/>
+      </View>
+      <FlatList
+        data={data}
+        keyExtractor={({ id }, index) => id.toString()}
+        renderItem={({ item }) => (
+        <Card 
+          style={styles.card} 
+          onPress={() => navigation.navigate("LocationDetails", { 
+            name: item.name,
+            parent: item.parent_id,
+            address: item.address
+          })}
+          >
+          <Card.Content>
             <Title>{item.name}</Title>
                 {item.parent_id == null ? <Paragraph>{item.name}</Paragraph> : <Paragraph>{returnParents(item.parent_id)}</Paragraph>}
-            </Card.Content>
-          </Card>
+          </Card.Content>
+        </Card>
         )}
       />
     </SafeAreaView>    
@@ -54,23 +70,30 @@ const Search = ( { navigation } ) => {
 export default Search;
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+  card: {
+    borderRadius: 10,
+    marginBottom: 12,
+    marginHorizontal: 20,
   },
-  search: {
-    height: 40,
-    borderRadius: 15,
+  searchContainer: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderColor: '#000',
+    alignItems: 'center',
+    borderRadius: 10,
     borderWidth: 1,
     color: 'gray',
     margin: 10,
-    marginVertical: 15,
-    backgroundColor: 'white' 
-  },
-  card: {
-    borderRadius: 10,
-    marginVertical: 8,
+    marginVertical: 12,
     marginHorizontal: 20,
+    backgroundColor: 'white'
+  },
+  inputStyle: {
+    flex: 1,
+    color: "black",
+    marginHorizontal: 5
+  },
+  icon: {
+    marginRight: 10
   }
 })
