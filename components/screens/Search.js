@@ -22,33 +22,31 @@ const Search = ( { navigation } ) => {
   }
 
   return (
-    <SafeAreaView >
-      <ScrollView >
-        <TextInput
-          style={styles.search}
-          onChangeText={text => onChangeText(text)}
-          value={value}
-          />
-          <FlatList
-            data={global.locationsData}
-            keyExtractor={({ id }, index) => id.toString()}
-            renderItem={({ item }) => (
-              <Card 
-              style={styles.card} 
-              onPress={() => navigation.navigate("LocationDetails", { 
-                name: item.name,
-                parent: item.parent_id,
-                address: item.address
-              })}
-              >
-              <Card.Content>
-                <Title>{item.name}</Title>
+    <SafeAreaView style={{flex: 1}}>
+      <TextInput
+        style={styles.search}
+        onChangeText={text => onChangeText(text)}
+        value={value}
+        />
+        <FlatList
+          data={global.locationsData}
+          keyExtractor={({ id }, index) => id.toString()}
+          renderItem={({ item }) => (
+          <Card 
+            style={styles.card} 
+            onPress={() => navigation.navigate("LocationDetails", { 
+              name: item.name,
+              parent: item.parent_id,
+              address: item.address
+            })}
+            >
+            <Card.Content>
+            <Title>{item.name}</Title>
                 {item.parent_id == null ? <Paragraph>{item.name}</Paragraph> : <Paragraph>{returnParents(item.parent_id)}</Paragraph>}
-              </Card.Content>
-              </Card>
-            )}
-          />
-      </ScrollView>
+            </Card.Content>
+          </Card>
+        )}
+      />
     </SafeAreaView>    
   );
 };
