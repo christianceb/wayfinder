@@ -10,21 +10,16 @@ import { Card, Title, Paragraph } from 'react-native-paper';
 
 const Search = ( { navigation } ) => {
   const [value, onChangeText] = React.useState(' ');
-  const [data, setData] = useState([]);
 
-  const getLocationsFromApiAsync = async () => {
-    try {
-      let response = await fetch(
-        'http://wayfinder-laravel.herokuapp.com/api/locations'
-      );
-      let json = await response.json();
-      setData(json.result.data)
-    } catch (error) {
-      console.error(error);
+  const returnParents = (parent) => {
+    let parentLocation = global.locationsData.find(item => item.id == parent);
+    let parentsString = parentLocation.name;
+
+    if (parentLocation.parent_id !== null) {
+      parentsString += ", " + returnParents(parentLocation.parent_id)
     }
-  };
-
-  getLocationsFromApiAsync();
+    return parentsString
+  }
 
   return (
     <SafeAreaView >
@@ -35,24 +30,24 @@ const Search = ( { navigation } ) => {
           value={value}
           />
           <FlatList
-          data={data}
-          keyExtractor={({ id }, index) => id}
-          renderItem={({ item }) => (
-            <Card 
-            style={styles.card} 
-            onPress={() => navigation.navigate("LocationDetails", { 
-              name: item.name,
-              parent: item?.parent?.name,
-              address: item.address
-            })}
-            >
-            <Card.Content>
-              <Title>{item.name}</Title>
-              {item.parent == null ? <Paragraph>{item.name}</Paragraph> : <Paragraph>{item.parent.name}</Paragraph>}
-            </Card.Content>
-            </Card>
-          )}
-        />
+            data={global.locationsData}
+            keyExtractor={({ id }, index) => id.toString()}
+            renderItem={({ item }) => (
+              <Card 
+              style={styles.card} 
+              onPress={() => navigation.navigate("LocationDetails", { 
+                name: item.name,
+                parent: item.parent_id,
+                address: item.address
+              })}
+              >
+              <Card.Content>
+                <Title>{item.name}</Title>
+                {item.parent_id == null ? <Paragraph>{item.name}</Paragraph> : <Paragraph>{returnParents(item.parent_id)}</Paragraph>}
+              </Card.Content>
+              </Card>
+            )}
+          />
       </ScrollView>
     </SafeAreaView>    
   );
