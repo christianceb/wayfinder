@@ -11,6 +11,18 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const LocationDetails = ( {navigation, route} ) => {
+  const getParentName = (id) => {
+    if (id != null) {
+      let locationsParent = global.locationsData.find(item => item.id == id);
+      let parentsName = locationsParent.name;
+
+      if (locationsParent.parent_id != null) {
+        parentsName += ", " + getParentName(locationsParent.parent_id)
+      }
+      return parentsName
+    }
+    return route.params.name
+  }
   return (
     <SafeAreaView>
       <ScrollView>
@@ -23,7 +35,7 @@ const LocationDetails = ( {navigation, route} ) => {
         <View style={styles.viewBottom}>
         <MaterialIcon name="office-building" size={30} color="#000000" />
           <Text style={styles.text}>
-            {route.params.parent}
+            {getParentName(route.params.parent)}
           </Text>
         </View>
         <View style={styles.viewBottom}>
