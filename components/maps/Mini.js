@@ -22,14 +22,25 @@ export class Mini extends Component {
         if (typeof props.locationId === 'undefined' || props.locationId == null) {
             this.renderMap = false;
         } else {
-            this.location = global.locationsData.find(element => element.id == props.locationId);
-    
+            this.location = this.findSuitableLocations(props.locationId);
+
             this.state = {
                 location: featureCollection([feature({
                     "coordinates": [parseFloat(this.location.mp_lng), parseFloat(this.location.mp_lat)],
                     "type": "Point"
                 })])
             };
+        }
+    }
+
+    findSuitableLocations(location_id)
+    {
+        let location = global.locationsData.find(l => l.id == location_id);
+
+        if (location.mp_lng && location.mp_lat) {
+            return location;
+        } else {
+            return this.findSuitableLocations(location.parent_id);
         }
     }
 
