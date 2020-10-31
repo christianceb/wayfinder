@@ -23,10 +23,15 @@ export default class Calendar extends Component {
 
   async componentDidMount()
   {
-    let results = await this.queryEvents(this.state.date);
+    let results = await this.queryEvents(this.state.date)
+    let data = [];
+
+    if (results !== null) {
+      data = results.result.data
+    }
 
     this.setState({
-      events: results.result.data
+      events: data
     });
   }
 
@@ -77,15 +82,25 @@ export default class Calendar extends Component {
 
   async queryEvents(date) {
     const response = await fetch(`https://wayfinder-laravel.herokuapp.com/api/events?after=${date}`);
-    return response.json();
+    
+    if (response.ok) {
+      return response.json();
+    }
+
+    return null;
   }
 
   onDayPress(day) {
     (async () => {
       let results = await this.queryEvents(day.dateString)
+      let data = [];
+
+      if (results !== null) {
+        data = results.result.data
+      }
 
       this.setState({
-        events: results.result.data
+        events: data
       });
     })()
 
