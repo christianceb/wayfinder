@@ -11,7 +11,7 @@ const Tab = createMaterialBottomTabNavigator();
 
 const MainTabScreen = () => (
     <Tab.Navigator
-      initialRouteName="Calendar"
+      initialRouteName="Home"
       activeColor="#fff"
       barStyle={styles.bar}
       >

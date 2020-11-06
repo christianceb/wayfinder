@@ -1,17 +1,22 @@
-import React, { Component } from 'react';
-import { View, Text } from 'react-native';
-import MapboxGL, { MapView, Camera, UserLocation } from "@react-native-mapbox-gl/maps";
-import { ToggleButton, FAB } from 'react-native-paper';
+import React, { Component } from 'react'
+import { View, Text, Image } from 'react-native'
+import MapboxGL, { MapView, Camera, UserLocation } from "@react-native-mapbox-gl/maps"
+import { featureCollection, feature } from '@turf/helpers'
+import { ToggleButton, FAB } from 'react-native-paper'
 import Baseline from './Baseline'
 import Marker from '~/assets/room-2x.png'
-import {featureCollection, feature} from '@turf/helpers';
 import WF_Off from "~/Wayfinder_Offline"
+import BuildingSelect from './BuildingSelect'
 
-export class Main extends Component {
+export class Main extends Component
+{
     constructor(props) {
         super(props)
 
-        const features = this.buildFeatures(WF_Off.locations.grouped);
+        const features = this.buildFeatures(WF_Off.locations.grouped)
+
+        this.maxEnterBuildingModeRadius = 0.5; // 500 meters
+        this.roomZoomMinBreakpoint = 18
 
         this.state = {
             timestamp: 0,
@@ -19,11 +24,9 @@ export class Main extends Component {
             longitude: Baseline.Lng,
             campuses: featureCollection([...features[0]]),
             buildings: featureCollection([...features[1]]),
-            focus: {
-                isFocused: false,
-                building: null,
-                level: null,
-            },
+            rooms: featureCollection([...features[2]]),
+            focus: { ...focus },
+            overlay: { ...overlay },
             pendingCampusFly: false,
             processingFly: false,
             queueVisibleMapScan: false,
@@ -32,8 +35,10 @@ export class Main extends Component {
 
         this.onUserLocationUpdate = this.onUserLocationUpdate.bind(this);
         this.onRegionDidChange = this.onRegionDidChange.bind(this);
+        this.onBuildingUpdate = this.onBuildingUpdate.bind(this);
         this.centerPosition = this.centerPosition.bind(this);
         this.floorChange = this.floorChange.bind(this);
+        this.unsetFocusOverlay = this.unsetFocusOverlay.bind(this);
     }
 
     buildFeatures(locations) {
@@ -44,10 +49,6 @@ export class Main extends Component {
         ]
 
         for (const type in locations) {
-            if (type === 2) {
-                continue;
-            }
-
             for (const location of locations[type]) {
                 if (location.mp_lat && location.mp_lng) {
                     grouped[type].push(this.buildFeature(location));
@@ -64,7 +65,13 @@ export class Main extends Component {
             "type": "Point"
         }
 
-        return feature(geometry, null, {id: location.id});
+        let properties = null;
+
+        if (location.type === 2) {
+            properties = { floor_id: location.floor_id }
+        }
+
+        return feature(geometry, properties, { id: location.id });
     }
 
     centerPosition() {
@@ -76,7 +83,41 @@ export class Main extends Component {
     }
 
     async onRegionDidChange(e) {
-        this.findClosestCampus([e.geometry.coordinates[1], e.geometry.coordinates[0]]);
+        const center = [e.geometry.coordinates[1], e.geometry.coordinates[0]];
+
+        if (e.properties.zoomLevel < this.roomZoomMinBreakpoint) {
+            this.unsetFocusOverlay()
+        }
+        else {
+            if (this.state.focus.isFocused) {
+                const building = WF_Off.findLocationById(this.state.focus.building)
+                const campus = WF_Off.findLocationById(building.parent_id)
+    
+                // If distance from center to building is now outside the radius, find the nearest campus or bust
+                if (this.haversineDistance(center, [campus.mp_lat, campus.mp_lng]) > this.maxEnterBuildingModeRadius) {
+                    this.findClosestCampus(center)
+                }
+            } else {
+                this.findClosestCampus(center)
+            }
+        }
+
+    }
+
+    cornerCoordinates(ne, sw) {
+        return [
+            [parseFloat(sw[0]), parseFloat(ne[1])],
+            [parseFloat(ne[0]), parseFloat(ne[1])],
+            [parseFloat(ne[0]), parseFloat(sw[1])],
+            [parseFloat(sw[0]), parseFloat(sw[1])]
+        ];
+    }
+
+    unsetFocusOverlay() {
+        this.setState({
+            overlay: { ...overlay },
+            focus: { ...focus }
+        })
     }
 
     findClosestCampus(center) {
@@ -96,31 +137,106 @@ export class Main extends Component {
              * Joondalup has campuses as close as 900m apart. So we put a hard border how close
              * from the center of the screen should we determine the closest campus
              */
-            if (distance < 0.8)
+            if (distance < this.maxEnterBuildingModeRadius)
             {
                 if (closest.distance === null || distance < closest.distance)
                 {
+                    //TODO: ensure that we do not reapply focus flags and the overlay
                     closest.campus = campus;
                     closest.distance = distance;
 
-                    // TODO: Do overlay shit here
-                    WF_Off.getChildrenByParent(closest.campus.id)
+                    const children_ids = WF_Off.getChildrenIdsByParentLocationId(closest.campus.id)
+                    
+                    // Pick first child no matter how sensical it is
+                    const floor_data = this.buildFloorDataByBuilding(children_ids[0])
+                    const current_floor = floor_data.floors[floor_data.level]
+
+                    this.setState({
+                        focus: {
+                            isFocused: true,
+                            building: children_ids[0],
+                            floors: floor_data.floors,
+                            level: floor_data.level,
+                        },
+                        overlay: {
+                            filter: this.buildFloorFilterParams(current_floor),
+                            url: current_floor.overlay_url,
+                            coordinates: this.cornerCoordinates(
+                                [current_floor.ne_lng, current_floor.ne_lat],
+                                [current_floor.sw_lng, current_floor.sw_lat]
+                            )
+                        }
+                    })
                     
                     break;  // No need to waste further iterations when we found a campus less than 800m away
                 }
             }
         }
+
+        // Sanely turn off focus
+        if (closest.campus === null && this.state.focus.isFocused === true) {
+            this.unsetFocusOverlay()
+        }
+    }
+
+    buildFloorDataByBuilding(id) {
+        const floors = WF_Off.getFloorsByLocation(id)
+        const level_zero = floors.find(x => x.order === 0)
+
+        return {
+            floors: floors,
+            level: level_zero?.id
+        }
+    }
+
+    buildFloorFilterParams(floor) {
+        return ['==', ['get', 'floor_id'], floor.id];
     }
 
     floorChange(value) {
-        this.setState({
-            focus: {
-                level: value
-            }
-        })
+        // Ignore null value returned by floorChange event
+        if (value !== null) { 
+            const floor = WF_Off.findFloorById(value);
+
+            this.setState({
+                focus: {
+                    ...this.state.focus,
+                    level: value
+                },
+                overlay: {
+                    coordinates: this.cornerCoordinates(
+                        [floor.ne_lng, floor.ne_lat],
+                        [floor.sw_lng, floor.sw_lat]
+                    ),
+                    url: floor.overlay_url,
+                    filter: this.buildFloorFilterParams(floor)
+                }
+            })
+        }
+    }
+
+    renderLevelSelect() {
+        const toggle_buttons = []
+
+        for (const floor of this.state.focus.floors) {
+            toggle_buttons.push(
+                <ToggleButton
+                    key={floor.id}
+                    style={this.state.focus.level === floor.id ? styles.tbSelected : styles.tb}
+                    icon={() => (<Text style={styles.tbText}>{floor.name}</Text>)}
+                    value={floor.id} />
+            )
+        }
+
+        return toggle_buttons;
     }
 
     haversineDistance([lat_a, lng_a], [lat_b, lng_b]) {
+        lat_a = parseFloat(lat_a)
+        lng_a = parseFloat(lng_a)
+        lat_b = parseFloat(lat_b)
+        lng_b = parseFloat(lng_b)
+
         const toRadian = angle => (Math.PI / 180) * angle;
         const distance = (a, b) => (Math.PI / 180) * (a - b);
 
@@ -139,7 +255,7 @@ export class Main extends Component {
         const c = 2 * Math.asin(Math.sqrt(a));
 
         return Baseline.EARTH_RADIUS * c;
-    };  
+    }
 
     onUserLocationUpdate(location) {
         if (location) {
@@ -156,7 +272,7 @@ export class Main extends Component {
         if (this.state.pendingCampusFly && this.state.processingFly === false && typeof this._camera !== "undefined") {
             this.setState({processingFly: true});
             
-            const campus = WF_Off.findCampusById(this.props.campus);
+            const campus = WF_Off.findLocationById(this.props.campus);
 
             if (campus) {
                 this._camera.setCamera({
@@ -190,6 +306,26 @@ export class Main extends Component {
         }
     }
 
+    onBuildingUpdate(building_id) {
+        const floors_data = this.buildFloorDataByBuilding(building_id)
+        const building = WF_Off.findLocationById(building_id)
+
+        this._camera.setCamera({
+            centerCoordinate: [building.mp_lng, building.mp_lat],
+            zoomLevel: 17,
+            animationDuration: 200,
+        });
+
+        this.setState({
+            focus: {
+                ...this.state.focus,
+                building: building_id,
+                floors: floors_data.floors,
+                level: floors_data.level
+            }
+        });
+    }
+
     render() {
         return (
             <View style={{flex: 1}}>
@@ -203,26 +339,48 @@ export class Main extends Component {
                     <MapboxGL.ShapeSource id="buildingsSource" hitbox={{width: 36, height: 36}} shape={this.state.buildings}>
                         <MapboxGL.SymbolLayer id="buildingsSymbols" minZoomLevel={14} maxZoomLevel={18} style={styles.icon} />
                     </MapboxGL.ShapeSource>
+                    <MapboxGL.ShapeSource id="roomsSource" hitbox={{width: 36, height: 36}} shape={this.state.rooms}>
+                        <MapboxGL.SymbolLayer id="roomsSymbols" minZoomLevel={this.roomZoomMinBreakpoint} filter={this.state.overlay.filter} style={styles.icon} />
+                    </MapboxGL.ShapeSource>
+
+                    <MapboxGL.ImageSource 
+                        id="mapOverlaySource"
+                        coordinates={this.state.overlay.coordinates}
+                        url={this.state.overlay.url}>
+                        <MapboxGL.RasterLayer id="mapOverlayLayer" belowLayerID="roomsSymbols" />
+                    </MapboxGL.ImageSource>
                 </MapView>
 
                 <FAB icon="map-marker" large onPress={this.centerPosition} style={styles.fab} />
 
                 <View style={styles.tbGroup}>
                     <ToggleButton.Group value={this.state.focus.level} onValueChange={this.floorChange}>
-                        {/* {this.state.focus.isFocused && this.renderLevelSelect()} */}
-
                         {this.state.focus.isFocused &&
-                            <>
-                                <ToggleButton style={[styles.tb, styles.tbSelected]} icon={()=> (<Text style={styles.tbText}>G</Text>)} value="left" />
-                                <ToggleButton style={[styles.tb]} icon={()=> (<Text style={styles.tbText}>B1</Text>)} value="rito" />
-                            </>
+                            <>{this.renderLevelSelect()}</>
                         }
                     </ToggleButton.Group>
                 </View>
+
+                <BuildingSelect building={this.state.focus.building} onBuildingUpdate={this.onBuildingUpdate} />
             </View>
         );
     }
 }
+
+const focus = {
+    isFocused: false,
+    building: null,
+    floors: null,
+    level: null
+}
+Object.freeze(focus)
+
+const overlay = {
+    url: "",
+    coordinates: [[0,0], [0,0], [0,0], [0,0]],
+    filter: null
+}
+Object.freeze(overlay)
 
 const styles = {
     icon: {
@@ -234,7 +392,8 @@ const styles = {
         left: 0,
         bottom: 0,
         margin: 16,
-        marginBottom: 32
+        marginBottom: 32,
+        flexDirection: "column-reverse"
     },
     tb: {
         backgroundColor: "skyblue"
