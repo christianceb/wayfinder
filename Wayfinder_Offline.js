@@ -73,9 +73,21 @@ class Wayfinder_Offline {
         }
     }
 
+    getAllLocations(asArray = false) {
+        return asArray ? Object.values(this.locations.all) : this.locations.all;
+    }
+
     findLocationById(id) {
         if (id in this.locations.all) {
             return this.locations.all[id];
+        }
+
+        return false
+    }
+
+    getLocationsByType(type) {
+        if (type >= 0 && type <= 2) {
+            return this.locations.grouped[type]
         }
 
         return false
