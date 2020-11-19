@@ -26,6 +26,24 @@ const Search = ( { navigation } ) => {
     filter(value)
   }
 
+  const renderItem = ({ item }) => (
+    <Card 
+      style={styles.card} 
+      onPress={() => navigation.navigate("LocationDetails", { 
+        id: item.id,
+        name: item.name,
+        parent: item.parent_id,
+        type: item.type,
+        address: item.address
+      })}
+      >
+      <Card.Content>
+        <Title>{item.name}</Title>
+        <Paragraph>{item.parent_id ? WF_Off.getParentName(item.parent_id) : item.name}</Paragraph>
+      </Card.Content>
+    </Card>
+    )
+
   const filter = (text) => {
     let dataset = []
     text = toSearcheableString(text)
@@ -119,23 +137,7 @@ const Search = ( { navigation } ) => {
         data={data}
         keyExtractor={({ id }, index) => id.toString()}
         initialNumToRender={10}
-        renderItem={({ item }) => (
-        <Card 
-          style={styles.card} 
-          onPress={() => navigation.navigate("LocationDetails", { 
-            id: item.id,
-            name: item.name,
-            parent: item.parent_id,
-            type: item.type,
-            address: item.address
-          })}
-          >
-          <Card.Content>
-            <Title>{item.name}</Title>
-            <Paragraph>{item.parent_id ? WF_Off.getParentName(item.parent_id) : item.name}</Paragraph>
-          </Card.Content>
-        </Card>
-        )}
+        renderItem={renderItem}
       />
     </SafeAreaView>    
   );
