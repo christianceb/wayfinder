@@ -138,7 +138,6 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   header: {
-    height: 120,
     backgroundColor: '#da272d'
   },
   card: {
