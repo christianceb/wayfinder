@@ -10,7 +10,8 @@ import {
 import { ScrollView } from 'react-native-gesture-handler';
 import { Card, Title, Paragraph } from 'react-native-paper';
 import { RadioButton } from 'react-native-paper';
-import AsyncStorage from '@react-native-community/async-storage'
+import AsyncStorage from '@react-native-community/async-storage';
+import WF_Off from '~/Wayfinder_Offline';
 
 export default class Settings extends Component {
   constructor(props) {
@@ -28,15 +29,13 @@ export default class Settings extends Component {
   buildRadioButtonItems() {
     const rdItems = []
 
-    for (const location of global.locationsData) {
-      if (location.type === 0) {
-        rdItems.push(
-          <View key={location.id} style={styles.items}>
-            <Text>{location.name}</Text>
-            <RadioButton value={location.id} />
-          </View>
-        )
-      }
+    for (const location of WF_Off.getLocationsByType(0)) {
+      rdItems.push(
+        <View key={location.id} style={styles.items}>
+          <Text>{location.name}</Text>
+          <RadioButton value={location.id} />
+        </View>
+      )
     }
 
     return rdItems;
@@ -55,18 +54,11 @@ export default class Settings extends Component {
       // do nothing
     } finally {
       if (campus !== null) {
-        name = null;
-
-        for (const location of global.locationsData) {
-          if (location.id === campus) {
-            name = location.name;
-            break;
-          }
-        }
+        const location = WF_Off.findLocationById(campus)
 
         this.setState({
           campus: campus,
-          name: name
+          name: location.name
         })
       }
     }
@@ -78,7 +70,7 @@ export default class Settings extends Component {
     } catch (e) {
       // Do nothing despite failing to save the selected default campus?
     } finally {
-      let location = global.locationsData.find(element => element.id == this.state.campus);
+      let location = WF_Off.findLocationById(this.state.campus)
 
       this.setState({
         promptDefaultLocation: false,
