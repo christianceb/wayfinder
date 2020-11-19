@@ -28,9 +28,7 @@ export default class BuildingSelect extends Component {
         
         for (const sibling of WF_Off.getChildrenByParentLocationId(building.parent_id)) {
             if (sibling.id !== building.id) {
-                buildings.push(
-                    <List.Item key={sibling.id} title={sibling.name} onPress={() => this.handlePress(sibling)} />
-                )
+                buildings.push(sibling)
             }
         }
 
@@ -50,6 +48,12 @@ export default class BuildingSelect extends Component {
         })
     }
 
+    renderBuildingItems(buildings) {
+        return buildings.map(building => {
+            return <List.Item key={building.id} title={building.name} onPress={() => this.handlePress(building)} />
+        })
+    }
+
     render() {
         return ( this.state.current !== null &&
             <View style={styles.view}>
@@ -60,7 +64,7 @@ export default class BuildingSelect extends Component {
                         expanded={this.state.expanded}
                         onPress={() => this.setState({expanded: !this.state.expanded})}
                         >
-                        {this.state.buildings}
+                        {this.renderBuildingItems(this.state.buildings)}
                     </List.Accordion>
                 </List.Section>
             </View>
