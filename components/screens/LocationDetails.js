@@ -9,22 +9,9 @@ import {
 import { Mini as MiniMap } from '../maps/Mini'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import WF_Off from '~/Wayfinder_Offline';
 
 const LocationDetails = ( { navigation, route } ) => {
-  
-  const getParentName = (id) => {
-    if (id != null) {
-      let locationsParent = global.locationsData.find(item => item.id == id);
-      let parentsName = locationsParent.name;
-
-      if (locationsParent.parent_id != null) {
-        parentsName += ", " + getParentName(locationsParent.parent_id)
-      }
-      return parentsName
-    }
-    return route.params.name
-  }
-
   return (
     <SafeAreaView>
       <ScrollView>
@@ -37,13 +24,13 @@ const LocationDetails = ( { navigation, route } ) => {
         <View style={styles.viewBottom}>
         <MaterialIcon name="office-building" size={30} color="#000000" />
           <Text style={styles.text}>
-            {getParentName(route.params.parent)}
+            {route.params.type > 0 ? WF_Off.getParentName(route.params.parent) : route.params.name}
           </Text>
         </View>
         <View style={styles.viewBottom}>
         <Icon name="pin-drop" size={30} color="#000000" />
           <Text style={styles.text}>
-            {route.params.address}
+            {WF_Off.getAddress(route.params.id)}
           </Text>
         </View>
         <View style={{ paddingTop: 100 }}>

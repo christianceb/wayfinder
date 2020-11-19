@@ -131,6 +131,29 @@ class Wayfinder_Offline {
 
         return false
     }
+
+    getParentName(parent_id) {
+        let parentLocation = this.findLocationById(parent_id)
+        let parentsString = parentLocation.name
+
+        if (parentLocation.parent_id) {
+            parentsString += ", " + this.getParentName(parentLocation.parent_id)
+        }
+
+        return parentsString
+    }
+
+    getAddress(id) {
+        let location = this.findLocationById(id)
+
+        address = location.address
+
+        if (location.type > 1) {
+            address = this.getAddress(location.parent_id)
+        }
+
+        return address
+    }
 }
 
 const WF_Off = new Wayfinder_Offline();

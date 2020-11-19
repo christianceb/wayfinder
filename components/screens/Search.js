@@ -21,17 +21,6 @@ const Search = ( { navigation } ) => {
   const [queryString, _setQueryString] = useState("")
   const TYPE_MAP = ["Campuses", "Buildings", "Rooms"];
 
-  const returnParents = (parent_id) => {
-    let parentLocation = WF_Off.findLocationById(parent_id)
-    let parentsString = parentLocation.name
-
-    if (parentLocation.parent_id) {
-      parentsString += ", " + returnParents(parentLocation.parent_id)
-    }
-
-    return parentsString
-  }
-
   const setQueryString = (value) => {
     _setQueryString(value)
     filter(value)
@@ -134,14 +123,16 @@ const Search = ( { navigation } ) => {
         <Card 
           style={styles.card} 
           onPress={() => navigation.navigate("LocationDetails", { 
+            id: item.id,
             name: item.name,
             parent: item.parent_id,
+            type: item.type,
             address: item.address
           })}
           >
           <Card.Content>
             <Title>{item.name}</Title>
-            <Paragraph>{item.parent_id ? returnParents(item.parent_id) : item.name}</Paragraph>
+            <Paragraph>{item.parent_id ? WF_Off.getParentName(item.parent_id) : item.name}</Paragraph>
           </Card.Content>
         </Card>
         )}
