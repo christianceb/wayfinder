@@ -11,6 +11,7 @@ import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Paragraph } from 'react-native-paper';
 import { Mini as MiniMap } from '../maps/Mini'
+import WF_Off from '~/Wayfinder_Offline';
 
 export default class EventDetails extends Component {
   constructor(props)
@@ -28,49 +29,6 @@ export default class EventDetails extends Component {
     }
   }
 
-  printLocation(location_id) {
-    let reached_end = false;
-    const location_names = [];
-
-    while (reached_end === false) {
-      let found_location = global.locationsData.find( l => { return location_id == l.id } );
-      
-      if (found_location != null) {
-        location_names.push(found_location.name);
-      }
-
-      if (found_location.parent_id === null) {
-        reached_end = true
-      } else {
-        location_id = found_location.parent_id;
-      }
-    }
-
-    return location_names.join(", ");
-  }
-
-  printAddress(location_id) {
-    let found_building = false;
-    let address = "";
-
-    while (found_building === false) {
-      let found_location = global.locationsData.find( l => { return location_id == l.id } );
-      
-      if (found_location != null) {
-        address = found_location.address;
-      }
-
-      // If location is a building, end here;
-      if (found_location.type == 1) {
-        found_building = true;
-      } else {
-        location_id = found_location.parent_id;
-      }
-    }
-
-    return address;
-  }
-
   render() {
     return (
       <SafeAreaView>
@@ -86,13 +44,13 @@ export default class EventDetails extends Component {
           <View style={styles.viewBottom}>
             <Icon name="location-pin" size={30} color="#000000" />
             <Text style={styles.text}>
-              {this.printLocation(this.state.location_id)}
+              {WF_Off.getParentName(this.state.location_id)}
             </Text>
           </View>
           <View style={styles.viewBottom}>
             <Icon name="pin-drop" size={30} color="#000000" />
             <Text style={styles.text}>
-            {this.printAddress(this.state.location_id)}
+              {WF_Off.getAddress(this.state.location_id)}
             </Text>
           </View>
           <View style={{ paddingTop: 30 }}>
