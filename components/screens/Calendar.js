@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { Calendar as RN_Calendar } from 'react-native-calendars';
 import { Card, Title, Paragraph } from 'react-native-paper';
+import WF_Off from '~/Wayfinder_Offline';
 
 export default class Calendar extends Component {
   constructor(props)
@@ -41,27 +42,6 @@ export default class Calendar extends Component {
     }
   }
 
-  printLocation(location_id) {
-    let reached_end = false;
-    const location_names = [];
-
-    while (reached_end === false) {
-      let found_location = global.locationsData.find( l => { return location_id == l.id } );
-      
-      if (found_location != null) {
-        location_names.push(found_location.name);
-      }
-
-      if (found_location.parent_id === null) {
-        reached_end = true
-      } else {
-        location_id = found_location.parent_id;
-      }
-    }
-
-    return location_names.join(", ");
-  }
-
   renderCards(items) {
     const cards = [];
 
@@ -71,7 +51,7 @@ export default class Calendar extends Component {
           { event.attachment && <Card.Cover source={{ uri: event.attachment.remote_url }} /> }
           <Card.Content>
             <Title>{event.title}</Title>
-            <Paragraph>{this.printLocation(event.location_id)}</Paragraph>
+            <Paragraph>{WF_Off.getParentName(event.location_id)}</Paragraph>
           </Card.Content>
         </Card>
       )
