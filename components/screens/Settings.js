@@ -64,7 +64,7 @@ export default class Settings extends Component {
     }
   }
 
-  async saveDefaultCampus () {
+  async saveDefaultCampus() {
     try {
       await AsyncStorage.setItem('default_campus', this.state.campus.toString())
     } catch (e) {
@@ -89,7 +89,7 @@ export default class Settings extends Component {
             <View style={styles.blur}>
               <View style={styles.modal}>
                 <Text style={styles.head}>
-                  Default Campus
+                  Set Default Campus
                 </Text>
                 <RadioButton.Group onValueChange={value => this.setState({ campus: value })} value={this.state.campus}>{this.rbItems}</RadioButton.Group>
                 <View style={styles.button}>
