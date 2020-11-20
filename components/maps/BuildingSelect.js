@@ -16,7 +16,18 @@ export default class BuildingSelect extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (prevProps.building !== this.props.building && this.props.building > 0) {
+        if (prevProps.building !== null && this.props.building === null) {
+            this.setState({
+                current: null,
+                campus: null,
+                buildings: []
+            })
+        }
+        else if (
+            prevProps.building === null && this.props.building !== null
+            || prevProps.building != this.props.building
+        )
+        {
             this.rebuildList(this.props.building)
         }
     }
