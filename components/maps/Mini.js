@@ -76,7 +76,7 @@ export class Mini extends Component {
     render() {
         if (this.renderMap) {
             return (
-                <View>
+                <View style={{width: '100%', height: 400}}>
                     <MapboxGL.MapView style={{flex: 1}}>
                         <MapboxGL.Camera centerCoordinate={[parseFloat(this.location.mp_lng), parseFloat(this.location.mp_lat)]} zoomLevel={17} />
                         <MapboxGL.UserLocation visible={true} />
