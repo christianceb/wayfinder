@@ -34,7 +34,7 @@ const LocationDetails = ( { navigation, route } ) => {
           </Text>
         </View>
         <View style={{ paddingTop: 100 }}>
-          <MiniMap locationId={1} />
+          <MiniMap locationId={route.params.id} />
         </View>
       </ScrollView>
     </SafeAreaView>    
