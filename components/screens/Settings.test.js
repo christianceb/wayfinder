@@ -16,8 +16,9 @@ global.locationsData = [
   {"id":2,"name":"Leederville","type":0,"parent_id":null,"upload_id":null,"address":"43 Richmond Street, Leederville Western Australia 6007, Australia","mp_id":"address.3814715266816138","mp_lng":"115.84257784","mp_lat":"-31.93396092","created_at":"2020-07-21T02:35:00.000000Z","updated_at":"2020-10-05T06:03:45.000000Z"}
 ];
 
-it('renders correctly', () => {
-  renderer.create(<Settings />);
+it('Settings renders correctly and safely', () => {
+  const tree = renderer.create(<Settings />).toJSON();
+  expect(tree).toMatchSnapshot()
 });
 
 test("Test if buildRadioButtonItems() works", () => {
