@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { Calendar as RN_Calendar } from 'react-native-calendars';
-import { Card, Title, Paragraph } from 'react-native-paper';
+import { Card, Title, Paragraph, DarkTheme } from 'react-native-paper';
 import WF_Off from '~/Wayfinder_Offline';
 
 export default class Calendar extends Component {
@@ -54,11 +54,13 @@ export default class Calendar extends Component {
           <Card.Content>
             <Title>{event.title}</Title>
             <Paragraph>{WF_Off.getParentName(event.location_id)}</Paragraph>
+            <Paragraph>{this.nicePrintDate(event.start)} - {this.nicePrintDate(event.end)}</Paragraph>
           </Card.Content>
           </> : 
           <Card.Content>
             <Title>{event.title}</Title>
             <Paragraph>{WF_Off.getParentName(event.location_id)}</Paragraph>
+            <Paragraph>{this.nicePrintDate(event.start)} - {this.nicePrintDate(event.end)}</Paragraph>
           </Card.Content> }
         </Card>
       )
@@ -75,6 +77,10 @@ export default class Calendar extends Component {
     }
 
     return null;
+  }
+
+  nicePrintDate(date) {
+    return date
   }
 
   onDayPress(day) {
