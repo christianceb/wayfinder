@@ -50,7 +50,7 @@ export default class BuildingSelect extends Component {
 
     renderBuildingItems(buildings) {
         return buildings.map(building => {
-            return <List.Item key={building.id} title={building.name} onPress={() => this.handlePress(building)} />
+            return <List.Item titleStyle={styles.color}  key={building.id} title={building.name} onPress={() => this.handlePress(building)} />
         })
     }
 
@@ -59,6 +59,9 @@ export default class BuildingSelect extends Component {
             <View style={styles.view}>
                 <List.Section>
                     <List.Accordion
+                        style={styles.accordion}
+                        titleStyle={styles.color} 
+                        descriptionStyle={styles.color}
                         title={this.state.current?.name}
                         description={this.state.campus?.name}
                         expanded={this.state.expanded}
@@ -78,7 +81,18 @@ const styles = {
         top: 0,
         left: 0,
         right: 0,
-        margin: 16,
+        marginVertical: 8,
+        marginLeft: 8,
+        marginRight: 60,
         backgroundColor: "#da272d"
+    },
+    color: {
+        color: "#ffffff",
+        padding: 0
+    },
+    accordion: {
+        color: "#ffffff",
+        paddingVertical: 0,
+        paddingHorizontal: 8
     }
 }

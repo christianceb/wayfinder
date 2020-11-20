@@ -4,6 +4,7 @@ import Popup from '../modals/Popup'
 import { Main as MainMap } from '../maps/Main'
 import AsyncStorage from '@react-native-community/async-storage';
 
+
 export default class Home extends Component {
   constructor(props) {
     super(props)

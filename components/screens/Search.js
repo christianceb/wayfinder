@@ -106,19 +106,19 @@ const Search = ( { navigation } ) => {
               <RadioButton.Group onValueChange={value => _setChipValue(value)} value={chipValue}>
                 <View style={styles.items}>
                   <Text>{TYPE_MAP[0]}</Text>
-                  <RadioButton value="0" />
+                  <RadioButton color="#da272d" value="0" />
                 </View>
                 <View style={styles.items}>
                   <Text>{TYPE_MAP[1]}</Text>
-                  <RadioButton value="1" />
+                  <RadioButton color="#da272d" value="1" />
                 </View>
                 <View style={styles.items}>
                   <Text>{TYPE_MAP[2]}</Text>
-                  <RadioButton value="2" />
+                  <RadioButton color="#da272d" value="2" />
                 </View>
               </RadioButton.Group>
               <View style={styles.button}>
-                <Button title="OK" onPress={() => setFilterLocation(false)}/>
+                <Button color="#da272d" title="OK" onPress={() => setFilterLocation(false)}/>
               </View>
             </View>
           </View>

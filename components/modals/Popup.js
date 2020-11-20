@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-community/picker'
 import AsyncStorage from '@react-native-community/async-storage'
+import WF_Off from '../../Wayfinder_Offline';
 
 export default class Popup extends Component {
   constructor(props) {
@@ -28,7 +29,7 @@ export default class Popup extends Component {
   buildPickerItems() {
     const pickerItems = []
 
-    for (const location of global.locationsData) {
+    for (const location of WF_Off.getLocationsByType(0)) {
       if (location.type == 0) {
         // Set first item in the list for later use in the class
         if (this.firstItem === null) {
@@ -67,7 +68,7 @@ export default class Popup extends Component {
               {this.pickerItems}
             </Picker>
 
-            <Button title="OK" onPress={this.setCampus} />
+            <Button color="#da272d" title="OK" onPress={this.setCampus} />
           </View>
         </View>
       </Modal>
@@ -91,5 +92,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
     margin: 10,
+    color: "#da272d"
   }
 })
