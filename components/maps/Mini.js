@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { MapView, Camera, UserLocation, ShapeSource, SymbolLayer } from "@react-native-mapbox-gl/maps";
 import Marker from '~/assets/room-2x.png'
 import {featureCollection, feature} from '@turf/helpers';
+import WF_Off from '~/Wayfinder_Offline';
 
 const styles = {
     icon: {
@@ -35,7 +36,7 @@ export class Mini extends Component {
 
     findSuitableLocations(location_id)
     {
-        let location = global.locationsData.find(l => l.id == location_id);
+        let location = WF_Off.findLocationById(location_id)
 
         if (location.mp_lng && location.mp_lat) {
             return location;
