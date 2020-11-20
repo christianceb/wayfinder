@@ -33,7 +33,7 @@ export default class Settings extends Component {
       rdItems.push(
         <View key={location.id} style={styles.items}>
           <Text>{location.name}</Text>
-          <RadioButton value={location.id} />
+          <RadioButton color="#da272d" value={location.id} />
         </View>
       )
     }
@@ -93,7 +93,7 @@ export default class Settings extends Component {
                 </Text>
                 <RadioButton.Group onValueChange={value => this.setState({ campus: value })} value={this.state.campus}>{this.rbItems}</RadioButton.Group>
                 <View style={styles.button}>
-                  <Button title="OK" onPress={() => { this.saveDefaultCampus() }}/>
+                  <Button color="#da272d" title="OK" onPress={() => { this.saveDefaultCampus() }}/>
                 </View>
               </View>
             </View>

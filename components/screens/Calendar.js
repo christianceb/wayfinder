@@ -48,11 +48,18 @@ export default class Calendar extends Component {
     for (const event of items) {
       cards.push(
         <Card key={event.id} style={styles.card} onPress={() => this.navigation.navigate("EventDetails", event)}>
-          { event.attachment && <Card.Cover source={{ uri: event.attachment.remote_url }} /> }
+          { event.attachment ?
+          <>
+          <Card.Cover source={{ uri: event.attachment.remote_url }}  />
           <Card.Content>
             <Title>{event.title}</Title>
             <Paragraph>{WF_Off.getParentName(event.location_id)}</Paragraph>
           </Card.Content>
+          </> : 
+          <Card.Content>
+            <Title>{event.title}</Title>
+            <Paragraph>{WF_Off.getParentName(event.location_id)}</Paragraph>
+          </Card.Content> }
         </Card>
       )
     }
@@ -96,6 +103,7 @@ export default class Calendar extends Component {
       <SafeAreaView>
         <ScrollView>
           <RN_Calendar
+            style={styles.calendar}
             minDate="2020-01-01"
             onDayPress={this.onDayPress}
             markedDates={this.state.markedDates}
@@ -112,9 +120,12 @@ export default class Calendar extends Component {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 10,
-    marginTop: 15,
+    borderRadius: 8,
+    marginBottom: 12,
     marginHorizontal: 20,
+  },
+  calendar: {
+    marginBottom: 15
   }
 })
 

@@ -396,7 +396,7 @@ const styles = {
         flexDirection: "column-reverse"
     },
     tb: {
-        backgroundColor: "skyblue"
+        backgroundColor: "#414141"
     },
     tbSelected: {
         backgroundColor: "#da272d"
