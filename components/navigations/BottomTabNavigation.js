@@ -24,6 +24,14 @@ const MainTabScreen = () => (
             <Icon name="md-home" color={color} size={26} />
           ),
         }}
+        // add listeners to check if the tab is pressed or not https://reactnavigation.org/docs/navigation-events/#listeners-prop-on-screen
+        listeners={({ navigation, route }) => ({
+          tabPress: e => {
+              e.preventDefault()
+              navigation.navigate('Home')
+              console.log('PRESS: Home bottom tab navigation is pressed')
+          },
+        })}
       />
       <Tab.Screen
         name="Search"
@@ -34,6 +42,14 @@ const MainTabScreen = () => (
             <Icon name="search" color={color} size={26} />
           ),
         }}
+        // add listeners to check if the tab is pressed or not https://reactnavigation.org/docs/navigation-events/#listeners-prop-on-screen
+        listeners={({ navigation, route }) => ({
+          tabPress: e => {
+              e.preventDefault()
+              navigation.navigate('Search')
+              console.log('PRESS: Search bottom tab navigation is pressed')
+          },
+        })}
       />
       <Tab.Screen
         name="Calendar"
@@ -44,6 +60,14 @@ const MainTabScreen = () => (
             <Icon name="calendar" color={color} size={26} />
           ),
         }}
+        // add listeners to check if the tab is pressed or not https://reactnavigation.org/docs/navigation-events/#listeners-prop-on-screen
+        listeners={({ navigation, route }) => ({
+          tabPress: e => {
+              e.preventDefault()
+              navigation.navigate('Calendar')
+              console.log('PRESS: Calendar bottom tab navigation is pressed')
+          },
+        })}
       />
       <Tab.Screen
         name="Settings"
@@ -54,6 +78,14 @@ const MainTabScreen = () => (
             <Icon name="settings" color={color} size={26} />
           ),
         }}
+        // add listeners to check if the tab is pressed or not https://reactnavigation.org/docs/navigation-events/#listeners-prop-on-screen
+        listeners={({ navigation, route }) => ({
+          tabPress: e => {
+              e.preventDefault()
+              navigation.navigate('Settings')
+              console.log('PRESS: Settings bottom tab navigation is pressed')
+          },
+        })}
       />
     </Tab.Navigator>
 );

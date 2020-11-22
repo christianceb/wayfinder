@@ -77,6 +77,7 @@ export default class Settings extends Component {
         name: location.name
       });
     }
+    console.log('PRESS: Default campus is set to', this.state.name)
   }
 
   render() {

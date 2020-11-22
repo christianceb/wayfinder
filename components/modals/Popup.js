@@ -51,10 +51,13 @@ export default class Popup extends Component {
     } finally {
       this.setState({ visible: false });
     }
+    console.log('POPUP: The app has prompted the user to select a default campus')
+    console.log('PRESS: The user set the default campus')
   }
 
   onValueChange(itemValue) {
     this.setState({campus: itemValue});
+    console.log('POPUP: the user selects on of the default campus options')
   }
 
   render() {

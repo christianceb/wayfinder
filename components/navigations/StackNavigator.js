@@ -23,7 +23,7 @@ const StackNavigator = () => {
             backgroundColor: '#e3342f',
           },
           headerTintColor: '#fff',
-          }} 
+          }}
           />
           <Stack.Screen 
           name="LocationDetails" 

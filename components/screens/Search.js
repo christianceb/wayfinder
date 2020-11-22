@@ -35,7 +35,9 @@ const Search = ( { navigation } ) => {
         parent: item.parent_id,
         type: item.type,
         address: item.address
-      })}
+      },
+      console.log('PRESS: Location card is pressed')
+      )}
       >
       <Card.Content>
         <Title>{item.name}</Title>
@@ -65,8 +67,8 @@ const Search = ( { navigation } ) => {
 
         return itemData.indexOf(text) > -1;
       })
+      console.log('FILTER: The filter string is', text)
     }
-
     setData(dataset)
   }
 
@@ -118,17 +120,17 @@ const Search = ( { navigation } ) => {
                 </View>
               </RadioButton.Group>
               <View style={styles.button}>
-                <Button color="#da272d" title="OK" onPress={() => setFilterLocation(false)}/>
+                <Button color="#da272d" title="OK" onPress={() => setFilterLocation(false, console.log('PRESS: The user added a filter'))}/>
               </View>
             </View>
           </View>
         </Modal>
       <View style={styles.filterContainer}>
         <Icon style={styles.filterIcon} name='filter-list' color='black' size={30}
-          onPress={() => setFilterLocation(true)}
+          onPress={() => setFilterLocation(true, console.log('PRESS: The user tapped on the filter pop-up'))}
         />
         {chipValue &&
-          <Chip mode='outlined' style={styles.chip} onClose={() => _setChipValue(null)}>
+          <Chip mode='outlined' style={styles.chip} onClose={() => _setChipValue(null, console.log('PRESS: The user discard the filter'))}>
             {TYPE_MAP[chipValue]}
           </Chip>
         }
