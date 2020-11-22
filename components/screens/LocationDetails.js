@@ -11,6 +11,9 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WF_Off from '~/Wayfinder_Offline';
 
+/**
+ * Screen for Location Details
+ */
 const LocationDetails = ( { navigation, route } ) => {
   return (
     <SafeAreaView>

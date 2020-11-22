@@ -13,6 +13,9 @@ import { RadioButton } from 'react-native-paper';
 import AsyncStorage from '@react-native-community/async-storage';
 import WF_Off from '~/Wayfinder_Offline';
 
+/**
+ * Tab navigation screen for Settings (map)
+ */
 export default class Settings extends Component {
   constructor(props) {
     super(props)
@@ -23,9 +26,15 @@ export default class Settings extends Component {
       name: null
     }
 
+    // Build radio button items
     this.rbItems = this.buildRadioButtonItems();
   }
 
+  /**
+   * Build radio button components for when selecting a default campus
+   * 
+   * @returns {array} an array of <View /> components with a radio button component in it
+   */
   buildRadioButtonItems() {
     const rdItems = []
 
@@ -44,6 +53,9 @@ export default class Settings extends Component {
   async componentDidMount() {
     let campus = null
 
+    /**
+     * Retrieve stored default_campus from async storage and set it as state
+     */
     try {
       const value = await AsyncStorage.getItem('default_campus')
 
@@ -64,6 +76,10 @@ export default class Settings extends Component {
     }
   }
 
+  /**
+   * Callback upon closing the default campus selection prompt. Used to save the new default
+   * campus setting.
+   */
   async saveDefaultCampus () {
     try {
       await AsyncStorage.setItem('default_campus', this.state.campus.toString())
