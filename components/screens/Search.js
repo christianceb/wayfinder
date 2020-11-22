@@ -14,6 +14,9 @@ import { RadioButton } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import WF_Off from '~/Wayfinder_Offline.js';
 
+/**
+ * Tab navigation screen for Search
+ */
 const Search = ( { navigation } ) => {
   const [data, setData] = useState([]);
   const [filterLocation, setFilterLocation] = useState(false);
@@ -21,11 +24,22 @@ const Search = ( { navigation } ) => {
   const [queryString, _setQueryString] = useState("")
   const TYPE_MAP = ["Campuses", "Buildings", "Rooms"];
 
+  /**
+   * Callback to execute when string in search box changes
+   * 
+   * @param {string} value value to use in setting state and filtering
+   */
   const setQueryString = (value) => {
     _setQueryString(value)
     filter(value)
   }
 
+  /**
+   * Reusable card template for <FlatList />
+   * 
+   * @param {object} item an event object to fill the subcomponents and properties
+   * @return {Card} <Card /> component 
+   */
   const renderItem = ({ item }) => (
     <Card 
       style={styles.card} 
@@ -44,8 +58,13 @@ const Search = ( { navigation } ) => {
         <Paragraph>{item.parent_id ? WF_Off.getParentName(item.parent_id) : item.name}</Paragraph>
       </Card.Content>
     </Card>
-    )
+  )
 
+  /**
+   * Filter dataset used in FlatList based on search parameters
+   * 
+   * @param {string} text string to match against the dataset
+   */
   const filter = (text) => {
     let dataset = []
     text = toSearcheableString(text)
@@ -72,6 +91,13 @@ const Search = ( { navigation } ) => {
     setData(dataset)
   }
 
+  /**
+   * Clean up a given string from erroneous spaces and non-alphanumeric characters to make it
+   * suitable for searching strings
+   * 
+   * @param {string} value string to clean up
+   * @return {string} nice and tidy string
+   */
   const toSearcheableString = (value) => {
     return value
       .toLowerCase()
@@ -79,12 +105,14 @@ const Search = ( { navigation } ) => {
       .trim()
   }
 
+  /**
+   * Listen to changes in search filter and apply filter as needed
+   */
   useEffect(() => {
     if (!filterLocation) {
       filter(queryString)
     }
   }, [chipValue, filterLocation]);
-
 
   return (
     <SafeAreaView style={{flex: 1}}>

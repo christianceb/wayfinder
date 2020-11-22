@@ -1,14 +1,18 @@
 import React, { Component } from 'react';
 import { StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { Calendar as RN_Calendar } from 'react-native-calendars';
-import { Card, Title, Paragraph, DarkTheme } from 'react-native-paper';
+import { Card, Title, Paragraph } from 'react-native-paper';
 import WF_Off from '~/Wayfinder_Offline';
 
+/**
+ * Tab navigation screen for Calendar
+ */
 export default class Calendar extends Component {
   constructor(props)
   {
     super(props)
 
+    // Get current date so we can make it the preselected date on the calendar
     const now = new Date();
     const nowDateISO = now.toISOString().slice(0,10)
     
@@ -24,24 +28,39 @@ export default class Calendar extends Component {
 
   async componentDidMount()
   {
+    // Query from API the events based on the date
     let results = await this.queryEvents(this.state.date)
     let data = [];
 
+    // Prime data variable with results if not null
     if (results !== null) {
       data = results.result.data
     }
 
+    // Set data as state
     this.setState({
       events: data
     });
   }
 
+  /**
+   * Create parameters for the react-native-calendars Calendar to highlight currently selected date
+   * 
+   * @param {string} date an ISO 8601 date that has to be highlighted
+   * @return {object} parameter to be fed on markedDates prop in react-native-calendars Calendar
+   */
   buildSelectedMarkedDate(date) {
     return {
       [date]: { ...markedDatesParams },
     }
   }
 
+  /**
+   * Build <Card /> components based on an array of events
+   * 
+   * @param {array} items event objects in an array that need to be built a card
+   * @return {array} array of <Card /> components
+   */
   renderCards(items) {
     const cards = [];
 
@@ -72,6 +91,12 @@ export default class Calendar extends Component {
     return cards;
   }
 
+  /**
+   * Query the remote API for events
+   * 
+   * @param {string} date ISO 8601 to be used to query events on a specific date in API
+   * @return {array|null} array of event objects if there are any. null if the query failed
+   */
   async queryEvents(date) {
     const response = await fetch(`https://wayfinder-laravel.herokuapp.com/api/events?after=${date}`);
     
@@ -82,10 +107,23 @@ export default class Calendar extends Component {
     return null;
   }
 
+  /**
+   * Function to print a date from the API nicely
+   * 
+   * TODO: this function needs more work as this has been implemented hastily to catch a deadline.
+   * 
+   * @param {string} date date to be formatted to a human readable one
+   * @return {string} nicely formatted, human readable date
+   */
   nicePrintDate(date) {
     return date
   }
 
+  /**
+   * Callback by Calendar whenever user selects a date
+   * 
+   * @param {Date} day date object returned by Calendar
+   */
   onDayPress(day) {
     (async () => {
       let results = await this.queryEvents(day.dateString)

@@ -19,17 +19,23 @@ const overlay = {
 }
 Object.freeze(overlay)
 
+/**
+ * Map component smaller than <Main /> in size and functionality. Intended for Location or Event details.
+ */
 export class Mini extends Component {
     constructor(props) {
         super(props)
 
         this.renderMap = true;
 
+        // Sanity check our location id prop
         if (typeof props.locationId === 'undefined' || props.locationId == null) {
             this.renderMap = false;
         } else {
+            // Find a suitable place in the map to center to based on the location id
             this.location = this.findSuitableLocations(props.locationId);
 
+            // Build a GeoJSON feature based on the suitable location and set our map image overlay
             this.state = {
                 location: featureCollection([feature({
                     "coordinates": [parseFloat(this.location.mp_lng), parseFloat(this.location.mp_lat)],
@@ -40,6 +46,12 @@ export class Mini extends Component {
         }
     }
 
+    /**
+     * Create state parameters for an overlay if the location is a room (type 2)
+     * 
+     * @param {integer} locationId location's Id to look up
+     * @returns {object} overlay props that can be used in the component's state
+     */
     buildOverlayState = (locationId) => {
         const location = WF_Off.findLocationById(locationId)
         let overlayDraft = { ...overlay }
@@ -48,6 +60,7 @@ export class Mini extends Component {
             const floor = WF_Off.findFloorById(location.floor_id)
 
             if (location.floor_id !== null) {
+                // Get corners and image url and set to overlay parameters draft
                 overlayDraft = {
                     coordinates: cornerCoordinates(
                         [floor.ne_lng, floor.ne_lat],
@@ -62,6 +75,14 @@ export class Mini extends Component {
         return overlayDraft
     }
 
+    /**
+     * Find a suitable location to center in the map as there may be locations that do not have
+     * coordinates set. If the current location does not have coordinates, it looks up on its
+     * parent location and iterates until one is found.
+     * 
+     * @param {integer} locationId location Id to look up for a suitable location
+     * @return {object} a suitable location object
+     */
     findSuitableLocations(locationId)
     {
         let location = WF_Off.findLocationById(locationId)
@@ -96,6 +117,7 @@ export class Mini extends Component {
             );
         }
         else {
+            // Don't render
             return(null);
         }
     }

@@ -13,6 +13,9 @@ import { Paragraph } from 'react-native-paper';
 import { Mini as MiniMap } from '../maps/Mini'
 import WF_Off from '~/Wayfinder_Offline';
 
+/**
+ * Screen for Event Details
+ */
 export default class EventDetails extends Component {
   constructor(props)
   {

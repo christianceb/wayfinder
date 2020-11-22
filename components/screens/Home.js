@@ -4,7 +4,9 @@ import Popup from '../modals/Popup'
 import { Main as MainMap } from '../maps/Main'
 import AsyncStorage from '@react-native-community/async-storage';
 
-
+/**
+ * Tab navigation screen for Home (map)
+ */
 export default class Home extends Component {
   constructor(props) {
     super(props)
@@ -18,6 +20,7 @@ export default class Home extends Component {
   async componentDidMount() {
     let campus = null
 
+    // Get the default campus and if not, prompt user with the Default Campus popup
     try {
       const value = await AsyncStorage.getItem('default_campus')
 

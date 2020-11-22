@@ -8,8 +8,11 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-community/picker'
 import AsyncStorage from '@react-native-community/async-storage'
-import WF_Off from '../../Wayfinder_Offline';
+import WF_Off from '~/Wayfinder_Offline';
 
+/**
+ * Popup component for prompting user to select a default campus when it is not yet set on the device.
+ */
 export default class Popup extends Component {
   constructor(props) {
     super(props)
@@ -26,23 +29,29 @@ export default class Popup extends Component {
     this.onValueChange = this.onValueChange.bind(this)
   }
 
+  /**
+   * Build location components for the picker in the component
+   * 
+   * @returns {array} array of <Picker.Item /> components
+   */
   buildPickerItems() {
     const pickerItems = []
 
     for (const location of WF_Off.getLocationsByType(0)) {
-      if (location.type == 0) {
-        // Set first item in the list for later use in the class
-        if (this.firstItem === null) {
-          this.firstItem = location.id
-        }
-
-        pickerItems.push(<Picker.Item key={location.id} label={location.name} value={location.id} />)
+      // Set first item in the list for later use in the class. Used for preselecting a radio button
+      if (this.firstItem === null) {
+        this.firstItem = location.id
       }
+
+      pickerItems.push(<Picker.Item key={location.id} label={location.name} value={location.id} />)
     }
   
     return pickerItems;
   }
 
+  /**
+   * Set default campus based on the selected campus in the component
+   */
   async setCampus() {
     try {
       await AsyncStorage.setItem('default_campus', this.state.campus.toString())
@@ -55,6 +64,10 @@ export default class Popup extends Component {
     console.log('PRESS: The user set the default campus')
   }
 
+  /**
+   * Callback for whenever the picker value changes.
+   * @param {integer} itemValue id of the campus
+   */
   onValueChange(itemValue) {
     this.setState({campus: itemValue});
     console.log('POPUP: the user selects on of the default campus options')

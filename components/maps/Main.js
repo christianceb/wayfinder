@@ -7,7 +7,6 @@ import Baseline from './Baseline'
 import Marker from '~/assets/room-2x.png'
 import WF_Off from "~/Wayfinder_Offline"
 import BuildingSelect from './BuildingSelect'
-import { floor } from 'react-native-reanimated'
 
 /**
  * Map component for Home. Contains logic for pins, levels, buildings and campus mode
@@ -17,10 +16,11 @@ export class Main extends Component
     constructor(props) {
         super(props)
 
+        // Build map features needed to visualise our locations
         const features = this.buildFeatures(WF_Off.locations.grouped)
 
-        this.maxEnterBuildingModeRadius = 0.5; // 500 meters
-        this.roomZoomMinBreakpoint = 18
+        this.maxEnterBuildingModeRadius = 0.5 // 500 meters
+        this.roomZoomMinBreakpoint = 18 // Zoom level to display location pins whose type is 2 (room)
 
         this.state = {
             timestamp: 0,
@@ -45,6 +45,12 @@ export class Main extends Component
         this.unsetFocusOverlay = this.unsetFocusOverlay.bind(this);
     }
 
+    /**
+     * Iterate through our massive list of locations, group by type and create their pins
+     * 
+     * @param {object} locations object of locations to build features with
+     * @returns {array} grouped locations by type and their GeoJSON features.
+     */
     buildFeatures(locations) {
         const grouped = [
             [],  // Campuses
@@ -63,6 +69,12 @@ export class Main extends Component
         return grouped;
     }
 
+    /**
+     * Build our deterministic GeoJSON feature for our location pins.
+     * 
+     * @param {*} location 
+     * @returns {object} a GeoJSON feature in an object
+     */
     buildFeature(location) {
         const geometry = {
             "coordinates": [parseFloat(location.mp_lng), parseFloat(location.mp_lat)],
@@ -71,13 +83,21 @@ export class Main extends Component
 
         let properties = null;
 
+        // Add floor_id property for rooms so we can easily filter them later.
         if (location.type === 2) {
             properties = { floor_id: location.floor_id }
         }
 
+        // Generate GeoJSON feature based on our parameters.
         return feature(geometry, properties, { id: location.id });
     }
 
+    /**
+     * Given the lon/lat in the current state of the component, fly to that coordinate
+     * 
+     * Coordinates are updated by user location. So yes, this is basically flying
+     * to the device's current location
+     */
     centerPosition() {
         this._camera.setCamera({
             centerCoordinate: [this.state.longitude, this.state.latitude],
@@ -87,6 +107,9 @@ export class Main extends Component
         console.log('PRESS: The user tapped on the locate icon on the map')
     }
 
+    /**
+     * Callback function for whenever map view changes (pan, tilt, zoom)
+     */
     async onRegionDidChange(e) {
         const center = [e.geometry.coordinates[1], e.geometry.coordinates[0]];
 
@@ -96,7 +119,9 @@ export class Main extends Component
             console.log('EVENT: The user not in campus mode or building mode')
         }
         else {
-            if (this.state.focus.isFocused) {
+            // Currently focused, but do we need a re-render?
+            if (this.state.focus.isFocused)
+            {
                 const building = WF_Off.findLocationById(this.state.focus.building)
                 const campus = WF_Off.findLocationById(building.parent_id)
     
@@ -104,12 +129,25 @@ export class Main extends Component
                 if (this.haversineDistance(center, [campus.mp_lat, campus.mp_lng]) > this.maxEnterBuildingModeRadius) {
                     this.findClosestCampus(center)
                 }
-            } else {
+            }
+            // Currently in campus mode zoom levels, but still haven't found a campus to stick to. Lets find one.
+            else
+            {
                 this.findClosestCampus(center)
             }
         }
     }
 
+    /**
+     * REDUNDANT: use components/maps/Utils version of this method instead.
+     * 
+     * Helper function to get the remaining corners of two coordinates.
+     * 
+     * @param {array} ne north eastern coordinates. Not a strict requirement, but preferred
+     * @param {array} sw south western coordinates. Not a strict requirement, but preferred
+     * 
+     * @returns {array} all corners in an array starting from NW, NE, SE, and SW
+     */
     cornerCoordinates(ne, sw) {
         return [
             [parseFloat(sw[0]), parseFloat(ne[1])],
@@ -119,6 +157,9 @@ export class Main extends Component
         ];
     }
 
+    /**
+     * Unsets properties used for campus mode, essentially turning it off.
+     */
     unsetFocusOverlay() {
         this.setState({
             overlay: { ...overlay },
@@ -126,6 +167,12 @@ export class Main extends Component
         })
     }
 
+    /**
+     * Given the coordinate which is the center of the map on screen, find the closest campus
+     * and if it is within radius, enable campus mode.
+     * 
+     * @param {array} center latitude and longitude pairs in array to be used in determining proximity
+     */
     findClosestCampus(center) {
         let distance;
         const closest = {
@@ -133,6 +180,7 @@ export class Main extends Component
             distance: null
         }
 
+        // Iterate though campuses and see how close they are from center of map to their locations
         for (const campus of WF_Off.locations.grouped[0]) {
             distance = this.haversineDistance(
                 center,
@@ -145,15 +193,17 @@ export class Main extends Component
              */
             if (distance < this.maxEnterBuildingModeRadius)
             {
+                // Only run this block if previous state did not have campus mode open
                 if (closest.distance === null || distance < closest.distance)
                 {
                     //TODO: ensure that we do not reapply focus flags and the overlay
                     closest.campus = campus;
                     closest.distance = distance;
 
+                    // Get buildings of a given campus
                     const children_ids = WF_Off.getChildrenIdsByParentLocationId(closest.campus.id)
                     
-                    // Pick first child no matter how sensical it is
+                    // Pick first child in the list no matter how sensical it is
                     const floor_data = this.buildFloorDataByBuilding(children_ids[0])
                     const current_floor = floor_data.floors.find(f => f.id == floor_data.level)
 
@@ -185,6 +235,12 @@ export class Main extends Component
         console.log('EVENT: The user enters campus mode or building mode')
     }
 
+    /**
+     * Build floors data based on a location Id, presumably a building
+     * 
+     * @param {integer} id location (building) Id to create a floor data from
+     * @returns {object} floor(s) data and the level it should default to
+     */
     buildFloorDataByBuilding(id) {
         const floors = WF_Off.getFloorsByLocation(id)
         const level_zero = floors.find(x => x.order === 0)
@@ -195,10 +251,22 @@ export class Main extends Component
         }
     }
 
+    /**
+     * Helper function to set filters for MapboxGL.ShapeSource on room location pins based on floor Id
+     * 
+     * @param {integer} floor floor Id to filter to. Locations matching this floor will be visible. Hidden otherwise
+     * @returns {array} floor parameters readable by MapboxGL.ShapeSource
+     */
     buildFloorFilterParams(floor) {
         return ['==', ['get', 'floor_id'], floor.id];
     }
 
+    /**
+     * Callback for whenever a floor in level select is chosen. Renders new map overlay image and
+     * toggles location pins as needed
+     * 
+     * @param {integer} value the floor Id to set to selected
+     */
     floorChange(value) {
         // Ignore null value returned by floorChange event
         if (value !== null) { 
@@ -222,9 +290,15 @@ export class Main extends Component
         console.log('PRESS: The user is changing the building level on campus mode')
     }
 
+    /**
+     * Render Level Select <ToggleButton /> components based on state's focus.floor values
+     * 
+     * @returns {array} array of <ToggleButton /> components
+     */
     renderLevelSelect() {
         const toggle_buttons = []
 
+        // Iterate through floors in focus
         for (const floor of this.state.focus.floors) {
             toggle_buttons.push(
                 <ToggleButton
@@ -238,6 +312,11 @@ export class Main extends Component
         return toggle_buttons;
     }
 
+    /**
+     * Haversine formula function to determine distance between two coordinates
+     * 
+     * @returns {float} distance in kilometers
+     */
     haversineDistance([lat_a, lng_a], [lat_b, lng_b]) {
         lat_a = parseFloat(lat_a)
         lng_a = parseFloat(lng_a)
@@ -264,6 +343,9 @@ export class Main extends Component
         return Baseline.EARTH_RADIUS * c;
     }
 
+    /**
+     * Listen to changes in device's location and set them on state to move current location marker on map
+     */
     onUserLocationUpdate(location) {
         if (location) {
             this.setState({
@@ -274,20 +356,24 @@ export class Main extends Component
         }
     }
 
+    /**
+     * Fly camera to location if all flags are up
+     */
     componentDidUpdate(prevProps) {
-        // Fly camera to location if all flags are up
         if (this.state.pendingCampusFly && this.state.processingFly === false && typeof this._camera !== "undefined") {
             this.setState({processingFly: true});
             
             const campus = WF_Off.findLocationById(this.props.campus);
 
             if (campus) {
+                // Fly to coordinates
                 this._camera.setCamera({
                     centerCoordinate: [campus.mp_lng, campus.mp_lat],
                     zoomLevel: 17,
                     animationDuration: 2000,
                 });
 
+                // Turn off flags to allow succeeding camera fly to campuses to run
                 this.setState({
                     processingFly: false,
                     pendingCampusFly: false
@@ -313,10 +399,14 @@ export class Main extends Component
         }
     }
 
+    /**
+     * Callback for BuildingSelect whenever the context building changes
+     */
     onBuildingUpdate(building_id) {
         const floors_data = this.buildFloorDataByBuilding(building_id)
         const building = WF_Off.findLocationById(building_id)
 
+        // Fly to building coordinates
         this._camera.setCamera({
             centerCoordinate: [building.mp_lng, building.mp_lat],
             zoomLevel: 18,
@@ -336,6 +426,7 @@ export class Main extends Component
     render() {
         return (
             <View style={{flex: 1}}>
+                {/* Mapbox Map */}
                 <MapView
                     style={{flex: 1}}
                     ref={(map) => (this._map = map)}
@@ -345,6 +436,7 @@ export class Main extends Component
                     <UserLocation visible={true} onUpdate={this.onUserLocationUpdate} />
                     <Camera ref={(camera) => (this._camera = camera)} centerCoordinate={[Baseline.Lng, Baseline.Lat]} zoomLevel={10} />
 
+                    {/* Location Pins */}
                     <MapboxGL.ShapeSource id="campusesSource" hitbox={{width: 36, height: 36}} shape={this.state.campuses}>
                         <MapboxGL.SymbolLayer id="campusesSymbols" minZoomLevel={0} maxZoomLevel={14} style={styles.icon} />
                     </MapboxGL.ShapeSource>
@@ -355,6 +447,7 @@ export class Main extends Component
                         <MapboxGL.SymbolLayer id="roomsSymbols" minZoomLevel={this.roomZoomMinBreakpoint} filter={this.state.overlay.filter} style={styles.icon} />
                     </MapboxGL.ShapeSource>
 
+                    {/* Floor Image Overlay */}
                     <MapboxGL.ImageSource 
                         id="mapOverlaySource"
                         coordinates={this.state.overlay.coordinates}
@@ -363,8 +456,10 @@ export class Main extends Component
                     </MapboxGL.ImageSource>
                 </MapView>
 
+                {/* Center map on device location */}
                 <FAB icon="map-marker" large onPress={this.centerPosition} style={styles.fab} />
 
+                {/* Level Select */}
                 <View style={styles.tbGroup}>
                     <ToggleButton.Group value={this.state.focus.level} onValueChange={this.floorChange}>
                         {this.state.focus.isFocused &&
@@ -379,6 +474,7 @@ export class Main extends Component
     }
 }
 
+// Default focus states
 const focus = {
     isFocused: false,
     building: null,
@@ -387,6 +483,7 @@ const focus = {
 }
 Object.freeze(focus)
 
+// Default overlay states
 const overlay = {
     url: "",
     coordinates: [[0,0], [0,0], [0,0], [0,0]],
