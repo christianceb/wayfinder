@@ -316,7 +316,7 @@ export class Main extends Component
 
         this._camera.setCamera({
             centerCoordinate: [building.mp_lng, building.mp_lat],
-            zoomLevel: 17,
+            zoomLevel: 18,
             animationDuration: 200,
         });
 
@@ -346,7 +346,7 @@ export class Main extends Component
                         <MapboxGL.SymbolLayer id="campusesSymbols" minZoomLevel={0} maxZoomLevel={14} style={styles.icon} />
                     </MapboxGL.ShapeSource>
                     <MapboxGL.ShapeSource id="buildingsSource" hitbox={{width: 36, height: 36}} shape={this.state.buildings}>
-                        <MapboxGL.SymbolLayer id="buildingsSymbols" minZoomLevel={14} maxZoomLevel={18} style={styles.icon} />
+                        <MapboxGL.SymbolLayer id="buildingsSymbols" minZoomLevel={14} maxZoomLevel={19} style={styles.icon} />
                     </MapboxGL.ShapeSource>
                     <MapboxGL.ShapeSource id="roomsSource" hitbox={{width: 36, height: 36}} shape={this.state.rooms}>
                         <MapboxGL.SymbolLayer id="roomsSymbols" minZoomLevel={this.roomZoomMinBreakpoint} filter={this.state.overlay.filter} style={styles.icon} />
