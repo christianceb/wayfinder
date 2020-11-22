@@ -57,6 +57,7 @@ export default class BuildingSelect extends Component {
             // current: building,
             expanded: false
         })
+        console.log('PRESS: On campus mode, the user selected a building')
     }
 
     renderBuildingItems(buildings) {

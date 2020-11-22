@@ -47,7 +47,10 @@ export default class Calendar extends Component {
 
     for (const event of items) {
       cards.push(
-        <Card key={event.id} style={styles.card} onPress={() => this.navigation.navigate("EventDetails", event)}>
+        <Card key={event.id} style={styles.card} onPress={() => this.navigation.navigate("EventDetails", 
+            event, 
+            console.log('PRESS: Event card is pressed')
+          )}>
           { event.attachment ?
           <>
           <Card.Cover source={{ uri: event.attachment.remote_url }}  />
@@ -65,7 +68,7 @@ export default class Calendar extends Component {
         </Card>
       )
     }
-
+    console.log('EVENTS: Number of events =>', cards.length)
     return cards;
   }
 
@@ -101,6 +104,7 @@ export default class Calendar extends Component {
       date: day.dateString,
       markedDates: this.buildSelectedMarkedDate(day.dateString)
     });
+    console.log('PRESS: Selected date on calendar is', this.state.date)
   };
 
   render()

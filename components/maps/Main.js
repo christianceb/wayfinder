@@ -84,13 +84,16 @@ export class Main extends Component
             zoomLevel: 17,
             animationDuration: 1000,
         });
+        console.log('PRESS: The user tapped on the locate icon on the map')
     }
 
     async onRegionDidChange(e) {
         const center = [e.geometry.coordinates[1], e.geometry.coordinates[0]];
 
+        // If zoom level is zoomed out enough outside breakpoint, turn off campus mode
         if (e.properties.zoomLevel < this.roomZoomMinBreakpoint) {
             this.unsetFocusOverlay()
+            console.log('EVENT: The user not in campus mode or building mode')
         }
         else {
             if (this.state.focus.isFocused) {
@@ -105,7 +108,6 @@ export class Main extends Component
                 this.findClosestCampus(center)
             }
         }
-
     }
 
     cornerCoordinates(ne, sw) {
@@ -171,7 +173,6 @@ export class Main extends Component
                             )
                         }
                     })
-                    
                     break;  // No need to waste further iterations when we found a campus less than 800m away
                 }
             }
@@ -181,6 +182,7 @@ export class Main extends Component
         if (closest.campus === null && this.state.focus.isFocused === true) {
             this.unsetFocusOverlay()
         }
+        console.log('EVENT: The user enters campus mode or building mode')
     }
 
     buildFloorDataByBuilding(id) {
@@ -217,6 +219,7 @@ export class Main extends Component
                 }
             })
         }
+        console.log('PRESS: The user is changing the building level on campus mode')
     }
 
     renderLevelSelect() {
