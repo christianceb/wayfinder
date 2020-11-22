@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Text, Image } from 'react-native'
+import { View, Text } from 'react-native'
 import MapboxGL, { MapView, Camera, UserLocation } from "@react-native-mapbox-gl/maps"
 import { featureCollection, feature } from '@turf/helpers'
 import { ToggleButton, FAB } from 'react-native-paper'
@@ -7,7 +7,11 @@ import Baseline from './Baseline'
 import Marker from '~/assets/room-2x.png'
 import WF_Off from "~/Wayfinder_Offline"
 import BuildingSelect from './BuildingSelect'
+import { floor } from 'react-native-reanimated'
 
+/**
+ * Map component for Home. Contains logic for pins, levels, buildings and campus mode
+ */
 export class Main extends Component
 {
     constructor(props) {
@@ -149,7 +153,7 @@ export class Main extends Component
                     
                     // Pick first child no matter how sensical it is
                     const floor_data = this.buildFloorDataByBuilding(children_ids[0])
-                    const current_floor = floor_data.floors[floor_data.level]
+                    const current_floor = floor_data.floors.find(f => f.id == floor_data.level)
 
                     this.setState({
                         focus: {
@@ -329,7 +333,12 @@ export class Main extends Component
     render() {
         return (
             <View style={{flex: 1}}>
-                <MapView style={{flex: 1}} ref={(map) => (this._map = map)} onRegionDidChange={this.onRegionDidChange}>
+                <MapView
+                    style={{flex: 1}}
+                    ref={(map) => (this._map = map)}
+                    onRegionDidChange={this.onRegionDidChange}
+                    compassViewPosition={3} compassViewMargins={{x: 24, y: 96}}
+                    >
                     <UserLocation visible={true} onUpdate={this.onUserLocationUpdate} />
                     <Camera ref={(camera) => (this._camera = camera)} centerCoordinate={[Baseline.Lng, Baseline.Lat]} zoomLevel={10} />
 
