@@ -45,7 +45,7 @@ export default class Home extends Component {
   render() {
     return (
       <View style={{flex: 1}}>
-        <MainMap campus={this.state.campus} />
+        <MainMap campus={this.state.campus} navigation={this.props.navigation} />
         { this.state.promptDefaultLocation ? <Popup /> : null }
       </View>
     )

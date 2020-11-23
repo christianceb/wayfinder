@@ -36,7 +36,7 @@ export default class EventDetails extends Component {
     return (
       <SafeAreaView>
         <ScrollView>
-          { this.attachment && <View><Image style={styles.topImage} source={this.attachment} /></View> }
+          { this.state.attachment && <View><Image style={styles.topImage} source={{uri: this.state.attachment}} /></View> }
           <View style={styles.viewDescription}>
             <MaterialIcon name="calendar" size={50} color="#000000" />
             <View style={{ paddingLeft: 10 }}>

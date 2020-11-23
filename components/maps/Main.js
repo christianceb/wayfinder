@@ -16,6 +16,8 @@ export class Main extends Component
     constructor(props) {
         super(props)
 
+        this.navigation = props.navigation;
+
         // Build map features needed to visualise our locations
         const features = this.buildFeatures(WF_Off.locations.grouped)
 
@@ -423,6 +425,19 @@ export class Main extends Component
         });
     }
 
+    onSourceLayerPress = (features) => {
+        const location = WF_Off.findLocationById(features.features[0].id)
+        const locationDetailsParams = {
+            id: location.id,
+            name: location.name,
+            parent: location.parent_id,
+            type: location.type,
+            address: location.address
+        }
+
+        this.navigation.navigate("LocationDetails", locationDetailsParams)
+    }
+
     render() {
         return (
             <View style={{flex: 1}}>
@@ -437,13 +452,13 @@ export class Main extends Component
                     <Camera ref={(camera) => (this._camera = camera)} centerCoordinate={[Baseline.Lng, Baseline.Lat]} zoomLevel={10} />
 
                     {/* Location Pins */}
-                    <MapboxGL.ShapeSource id="campusesSource" hitbox={{width: 36, height: 36}} shape={this.state.campuses}>
+                    <MapboxGL.ShapeSource id="campusesSource" hitbox={{width: 36, height: 36}} shape={this.state.campuses} onPress={this.onSourceLayerPress}>
                         <MapboxGL.SymbolLayer id="campusesSymbols" minZoomLevel={0} maxZoomLevel={14} style={styles.icon} />
                     </MapboxGL.ShapeSource>
-                    <MapboxGL.ShapeSource id="buildingsSource" hitbox={{width: 36, height: 36}} shape={this.state.buildings}>
+                    <MapboxGL.ShapeSource id="buildingsSource" hitbox={{width: 36, height: 36}} shape={this.state.buildings} onPress={this.onSourceLayerPress}>
                         <MapboxGL.SymbolLayer id="buildingsSymbols" minZoomLevel={14} maxZoomLevel={19} style={styles.icon} />
                     </MapboxGL.ShapeSource>
-                    <MapboxGL.ShapeSource id="roomsSource" hitbox={{width: 36, height: 36}} shape={this.state.rooms}>
+                    <MapboxGL.ShapeSource id="roomsSource" hitbox={{width: 36, height: 36}} shape={this.state.rooms} onPress={this.onSourceLayerPress}>
                         <MapboxGL.SymbolLayer id="roomsSymbols" minZoomLevel={this.roomZoomMinBreakpoint} filter={this.state.overlay.filter} style={styles.icon} />
                     </MapboxGL.ShapeSource>
 

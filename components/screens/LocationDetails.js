@@ -15,6 +15,16 @@ import WF_Off from '~/Wayfinder_Offline';
  * Screen for Location Details
  */
 const LocationDetails = ( { navigation, route } ) => {
+  let floor = false
+
+  if (route.params.type == 2) {
+    let location = WF_Off.findLocationById(route.params.id)
+
+    if (location.floor_id) {
+      floor = WF_Off.findFloorById(location.floor_id)
+    }
+  }
+
   return (
     <SafeAreaView>
       <ScrollView>
@@ -24,8 +34,16 @@ const LocationDetails = ( { navigation, route } ) => {
             {route.params.name}
           </Text>
         </View>
+
+        { floor !== false ? (
+          <View style={styles.viewBottom}>
+            <MaterialIcon name="floor-plan" size={30} color="#000000" />
+            <Text style={styles.text}>{floor.name}</Text>
+          </View>
+        ) : null }
+        
         <View style={styles.viewBottom}>
-        <MaterialIcon name="office-building" size={30} color="#000000" />
+          <MaterialIcon name="office-building" size={30} color="#000000" />
           <Text style={styles.text}>
             {route.params.type > 0 ? WF_Off.getParentName(route.params.parent) : route.params.name}
           </Text>

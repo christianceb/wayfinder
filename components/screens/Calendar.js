@@ -72,17 +72,17 @@ export default class Calendar extends Component {
           )}>
           { event.attachment ?
           <>
-          <Card.Cover source={{ uri: event.attachment.remote_url }}  />
-          <Card.Content>
-            <Title>{event.title}</Title>
-            <Paragraph>{WF_Off.getParentName(event.location_id)}</Paragraph>
-            <Paragraph>{this.nicePrintDate(event.start)} - {this.nicePrintDate(event.end)}</Paragraph>
-          </Card.Content>
+            <Card.Cover source={{ uri: event.attachment.remote_url }}  />
+            <Card.Content>
+              <Title>{event.title}</Title>
+              <Paragraph>{WF_Off.getParentName(event.location_id)}</Paragraph>
+              <Paragraph>{this.nicePrintDates(event.start, event.end)}</Paragraph>
+            </Card.Content>
           </> : 
           <Card.Content>
             <Title>{event.title}</Title>
             <Paragraph>{WF_Off.getParentName(event.location_id)}</Paragraph>
-            <Paragraph>{this.nicePrintDate(event.start)} - {this.nicePrintDate(event.end)}</Paragraph>
+            <Paragraph>{this.nicePrintDates(event.start, event.end)}</Paragraph>
           </Card.Content> }
         </Card>
       )
@@ -108,14 +108,37 @@ export default class Calendar extends Component {
   }
 
   /**
-   * Function to print a date from the API nicely
+   * Function to print a from-to date from the API nicely
    * 
-   * TODO: this function needs more work as this has been implemented hastily to catch a deadline.
+   * @param {string} from from date to be formatted to a human readable one
+   * @param {string} to to date to be formatted to a human readable one
+   * @return {string} nicely formatted, human readable date range
+   */
+  nicePrintDates(from, to) {
+    from = this.nicePrintDate(from)
+    to = this.nicePrintDate(to)
+
+    let date = (from ?? "?") + " - " + (to ?? "?")
+
+    // Omit printing same date twice if they're the same
+    if (from == to) {
+      date = from
+    }
+
+    return date
+  }
+
+  /**
+   * Function to print a date value from the API nicely
    * 
    * @param {string} date date to be formatted to a human readable one
    * @return {string} nicely formatted, human readable date
    */
   nicePrintDate(date) {
+    if (date) {
+      date = new Intl.DateTimeFormat("en-AU", {dateStyle:"medium", timeStyle:"short"}).format(new Date(date))
+    }
+
     return date
   }
 
